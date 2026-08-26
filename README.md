@@ -1,19 +1,17 @@
 # microcontroladores
 Trabajo Colaborativo - Programación en Lenguaje C para Microcontroladores
 
-# 🛠️ Trabajo Colaborativo N°1 - Microcontroladores
-
 Bienvenido al repositorio del grupo **nikucode**. En este espacio desarrollamos, validamos y documentamos todos los ejercicios del Trabajo Colaborativo N°1 para la asignatura de Microcontroladores en la **Universidad Nacional Andrés Bello**.
 
 ---
 
-## 👥 Integrantes
+## Integrantes
 * **María José Córdova**
 * **Alex Díaz** (`nikucode`)
 
 ---
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 El repositorio está organizado de la siguiente manera para facilitar la revisión de cada actividad:
 
@@ -23,7 +21,7 @@ El repositorio está organizado de la siguiente manera para facilitar la revisi�
 
 ---
 
-## 💻 Tecnologías Utilizadas
+## Tecnologías Utilizadas
 * **Lenguaje:** C
 * **Editor:** Visual Studio Code
 * **Compilador:** GCC (vía MSYS2 / MinGW-w64)
