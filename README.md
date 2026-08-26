@@ -7,7 +7,7 @@ Bienvenido al repositorio del grupo **nikucode**. En este espacio desarrollamos,
 
 ## Integrantes
 * **María José Córdova**
-* **Alex Díaz** (`nikucode`)
+* **Alex Díaz**
 
 ---
 
