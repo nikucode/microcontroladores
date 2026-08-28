@@ -1,3 +1,6 @@
+// Realizar un diagrama de flujo y programa que cargue dos números
+// enteros por teclado e imprimir su suma y su producto
+
 #include <stdio.h>
 
 int main() 
