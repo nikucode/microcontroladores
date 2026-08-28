@@ -1,3 +1,7 @@
+// Realizar un diagrama de flujo y programa que determine la superficie
+//de un cuadrado, solicitando el ingreso de un lado.
+
+
 #include <stdio.h>
 
 int main() 
@@ -12,3 +16,4 @@ int main()
     
     return 0;
 }
+
