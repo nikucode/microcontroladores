@@ -3,8 +3,8 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Compilar y Ejecutar C (UCRT64)",
-            "command": "gcc ${fileBasename} -o ${fileBasenameNoExtension}.exe && ./${fileBasenameNoExtension}.exe",
+            "label": "Compilar y Ejecutar C (Linux)",
+            "command": "gcc \"${fileBasename}\" -o \"${fileBasenameNoExtension}\" && ./\"${fileBasenameNoExtension}\"",
             "options": {
                 "cwd": "${fileDirname}"
             },
@@ -12,7 +12,16 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Compila y ejecuta el archivo activo en su propia carpeta de forma segura."
+            "detail": "Compila y ejecuta el archivo C activo en Linux."
+        },
+        {
+            "type": "shell",
+            "label": "Compilar y Ejecutar C (Windows UCRT64)",
+            "command": "gcc \"${fileBasename}\" -o \"${fileBasenameNoExtension}.exe\" && ./\"${fileBasenameNoExtension}.exe\"",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "detail": "Compila y ejecuta el archivo C activo en Windows con MSYS2 UCRT64."
         }
     ]
 }

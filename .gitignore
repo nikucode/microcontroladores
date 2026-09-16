@@ -1,0 +1,13 @@
+# ejecutables compilados
+*.exe
+
+# ejecutables sin extension generados localmente
+parte1-postclase/ejercicio*
+parte2-portafolio/problema*
+
+# conservar los archivos fuente .c
+!parte1-postclase/*.c
+!parte2-portafolio/*.c
+
+# carpetas de compilacion
+build/
