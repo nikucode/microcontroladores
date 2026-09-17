@@ -22,7 +22,7 @@ int main()
     scanf("%d", &n3);
 
     // && significa "Y".
-    // Para entrar al if, TODAS las condiciones deben ser verdaderas:
+    // Para entrar al if todas las condiciones deben ser verdaderas:
     // n1 debe ser menor a 10
     // Y n2 debe ser menor a 10
     // Y n3 debe ser menor a 10.
