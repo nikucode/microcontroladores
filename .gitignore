@@ -11,3 +11,9 @@ parte2-portafolio/problema*
 
 # carpetas de compilacion
 build/
+
+# archivos auxiliares de LaTeX
+*.aux
+*.log
+*.out
+*.toc
