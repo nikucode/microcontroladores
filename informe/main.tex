@@ -1,0 +1,242 @@
+\documentclass[12pt,a4paper]{article}
+
+% --------------------------------------------------
+% PAQUETES
+% --------------------------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+
+% --------------------------------------------------
+% CONFIGURACION
+% --------------------------------------------------
+
+\geometry{
+    left=2cm,
+    right=2cm,
+    top=2cm,
+    bottom=2cm
+}
+
+\setstretch{1.15}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+% --------------------------------------------------
+% RUTAS DE LAS IMAGENES
+% --------------------------------------------------
+
+\graphicspath{
+    {../capturas/parte1-postclase/}
+    {../capturas/parte2-portafolio/}
+}
+
+% --------------------------------------------------
+% COMANDO GENERAL PARA CAPTURAS
+% --------------------------------------------------
+
+\newcommand{\captura}[2]{%
+
+    \begin{landscape}
+
+    \subsection{#1}
+
+    \begin{center}
+
+        \includegraphics[
+            width=0.90\linewidth,
+            height=0.78\textheight,
+            keepaspectratio
+        ]{#2}
+
+    \end{center}
+
+    \end{landscape}
+
+    \clearpage
+}
+
+% --------------------------------------------------
+% COMANDO PARA LA PRIMERA CAPTURA DE CADA PARTE
+% --------------------------------------------------
+
+\newcommand{\primeracaptura}[3]{%
+
+    \begin{landscape}
+
+    \section{#1}
+
+    \subsection{#2}
+
+    \begin{center}
+
+        \includegraphics[
+            width=0.90\linewidth,
+            height=0.70\textheight,
+            keepaspectratio
+        ]{#3}
+
+    \end{center}
+
+    \end{landscape}
+
+    \clearpage
+}
+
+% --------------------------------------------------
+% DOCUMENTO
+% --------------------------------------------------
+
+\begin{document}
+
+% --------------------------------------------------
+% PORTADA
+% --------------------------------------------------
+
+\pagenumbering{gobble}
+
+\begin{titlepage}
+
+    \centering
+
+    {\Large Universidad Andrés Bello\par}
+
+    \vspace{0.5cm}
+
+    {\large Ingeniería en Automatización y Robótica\par}
+
+    \vspace{2cm}
+
+    {\Huge\bfseries Trabajo Colaborativo N°1\par}
+
+    \vspace{0.5cm}
+
+    {\Large Programación de Microcontroladores\par}
+
+    \vspace{0.3cm}
+
+    {\Large Lenguaje C\par}
+
+    \vfill
+
+    \begin{flushleft}
+
+    \textbf{Integrantes:}
+
+    Alex Díaz
+
+    María José Córdova
+
+    \vspace{0.5cm}
+
+    \textbf{Asignatura:} Microcontroladores
+
+    \vspace{0.5cm}
+
+    \textbf{Semestre:} 2026-2
+
+    \end{flushleft}
+
+    \vfill
+
+\end{titlepage}
+
+% --------------------------------------------------
+% INDICE
+% --------------------------------------------------
+
+\pagenumbering{roman}
+
+\tableofcontents
+
+\clearpage
+
+\pagenumbering{arabic}
+
+% --------------------------------------------------
+% PARTE I
+% --------------------------------------------------
+
+\primeracaptura
+{Parte I --- Ejercicios post-clase}
+{Ejercicio 3}
+{ejercicio3.png}
+
+\captura{Ejercicio 4}{ejercicio4.png}
+\captura{Ejercicio 7}{ejercicio7.png}
+\captura{Ejercicio 8}{ejercicio8.png}
+\captura{Ejercicio 9}{ejercicio9.png}
+\captura{Ejercicio 10}{ejercicio10.png}
+\captura{Ejercicio 11}{ejercicio11.png}
+\captura{Ejercicio 15}{ejercicio15.png}
+\captura{Ejercicio 16}{ejercicio16.png}
+\captura{Ejercicio 17}{ejercicio17.png}
+\captura{Ejercicio 18}{ejercicio18.png}
+\captura{Ejercicio 21}{ejercicio21.png}
+\captura{Ejercicio 22}{ejercicio22.png}
+\captura{Ejercicio 23}{ejercicio23.png}
+\captura{Ejercicio 24}{ejercicio24.png}
+\captura{Ejercicio 25}{ejercicio25.png}
+\captura{Ejercicio 28}{ejercicio28.png}
+\captura{Ejercicio 29}{ejercicio29.png}
+\captura{Ejercicio 30}{ejercicio30.png}
+\captura{Ejercicio 31}{ejercicio31.png}
+\captura{Ejercicio 32}{ejercicio32.png}
+\captura{Ejercicio 40}{ejercicio40.png}
+
+% --------------------------------------------------
+% PARTE II
+% --------------------------------------------------
+
+\primeracaptura
+{Parte II --- Problemas de portafolio}
+{Problema 1}
+{problema1.png}
+
+\captura{Problema 2}{problema2.png}
+\captura{Problema 3}{problema3.png}
+\captura{Problema 4}{problema4.png}
+\captura{Problema 5}{problema5.png}
+\captura{Problema 6}{problema6.png}
+\captura{Problema 7}{problema7.png}
+\captura{Problema 8}{problema8.png}
+\captura{Problema 9}{problema9.png}
+\captura{Problema 10}{problema10.png}
+\captura{Problema 11}{problema11.png}
+\captura{Problema 12}{problema12.png}
+\captura{Problema 13}{problema13.png}
+\captura{Problema 14}{problema14.png}
+\captura{Problema 15}{problema15.png}
+\captura{Problema 16}{problema16.png}
+\captura{Problema 17}{problema17.png}
+\captura{Problema 18}{problema18.png}
+\captura{Problema 19}{problema19.png}
+\captura{Problema 20}{problema20.png}
+\captura{Problema 21}{problema21.png}
+\captura{Problema 22}{problema22.png}
+
+% --------------------------------------------------
+% REPOSITORIO
+% --------------------------------------------------
+
+\section{Repositorio}
+
+El código fuente y las evidencias de ejecución del trabajo se encuentran
+almacenados en el siguiente repositorio:
+
+\begin{center}
+\url{https://github.com/nikucode/microcontroladores}
+\end{center}
+
+\end{document}
