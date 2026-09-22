@@ -78,3 +78,9 @@ También aprendimos que cuando una simulación no funciona el problema no necesa
 Cada carpeta contiene el código C utilizado para una actividad.
 
 Las capturas de las simulaciones se encuentran en la carpeta `imagenes/`.
+
+## Informe en LaTeX
+
+Además de los ejercicios, documenté el desarrollo del trabajo en LaTeX para organizar los códigos, capturas de simulación y los principales aprendizajes obtenidos durante las actividades.
+
+El archivo fuente se encuentra en `main.tex` y el PDF compilado en `informe_trabajo_colaborativo_2.pdf`.
