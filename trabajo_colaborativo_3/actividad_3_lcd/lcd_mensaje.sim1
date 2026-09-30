@@ -1,0 +1,51 @@
+<circuit version="1.1.0-SR2" rev="260312" stepSize="1000000" stepsPS="1000000" NLsteps="100000" reaStep="1000000" animate="0" >
+
+<item itemtype="MCU" CircId="p16F877-1" mainComp="false" Show_id="true" Show_Val="false" Pos="-1340,-80" rotation="0" hflip="1" vflip="1" label="p16F877-1" idLabPos="0,-20" labelrot="0" valLabPos="-16,20" valLabRot="0" Frequency="4 MHz" Program="../lcd_mensaje.X/dist/default/production/lcd_mensaje.X.production.hex" Auto_Load="false" saveEepr="true" Wdt_enabled="false" Clk_Out="false" MainMcu="true" SerialMon="-1" />
+
+<item itemtype="Ground" CircId="Ground-19" mainComp="false" Show_id="false" Show_Val="false" Pos="-1232,-40" rotation="0" hflip="1" vflip="1" label="Ground-19" idLabPos="-16,8" labelrot="0" valLabPos="-16,20" valLabRot="0" />
+
+<item itemtype="Resistor" CircId="Resistor-29" mainComp="false" ShowProp="Resistance" Show_id="false" Show_Val="true" Pos="-1424,-100" rotation="0" hflip="1" vflip="1" label="Resistor-29" idLabPos="-16,-24" labelrot="0" valLabPos="-11.0632,5.81357" valLabRot="0" Resistance="10 kΩ" />
+
+<item itemtype="Fixed Voltage" CircId="Fixed Voltage-30" mainComp="false" ShowProp="Voltage" Show_id="false" Show_Val="true" Pos="-1456,-100" rotation="0" hflip="1" vflip="1" label="Fixed Voltage-30" idLabPos="-64,-24" labelrot="0" valLabPos="-6.84558,8" valLabRot="0" Voltage="5 V" Out="true" />
+
+<item itemtype="Ground" CircId="Ground-32" mainComp="false" Show_id="false" Show_Val="false" Pos="-1396,8" rotation="0" hflip="1" vflip="1" label="Ground-32" idLabPos="-16,8" labelrot="0" valLabPos="-16,20" valLabRot="0" />
+
+<item itemtype="Hd44780" CircId="Hd44780-35" mainComp="false" Show_id="true" Show_Val="false" Pos="-1228,-96" rotation="0" hflip="1" vflip="1" label="Hd44780-35" idLabPos="70,-82" labelrot="0" valLabPos="-16,20" valLabRot="0" Rows="2" Cols="16" />
+
+<item itemtype="Probe" CircId="Probe-36" mainComp="false" ShowProp="Threshold" Show_id="false" Show_Val="true" Pos="-1356,-112" rotation="-45" hflip="1" vflip="1" label="Probe-36" idLabPos="16,-16" labelrot="45" valLabPos="16,0" valLabRot="45" ShowVolt="true" Threshold="5 V" />
+
+<item itemtype="Switch" CircId="Switch-39" mainComp="false" Show_id="false" Show_Val="false" Pos="-1396,-36" rotation="90" hflip="1" vflip="1" label="Switch-39" idLabPos="-16,-24" labelrot="0" valLabPos="-16,20" valLabRot="0" Norm_Close="false" DT="false" Poles="1" />
+
+<item itemtype="Node" CircId="Node-38" mainComp="false" Pos="-1372,-72" />
+
+<item itemtype="Node" CircId="Node-40" mainComp="false" Pos="-1396,-72" />
+
+<item itemtype="Connector" uid="Connector-95" startpinid="Fixed Voltage-30-outnod" endpinid="Resistor-29-lPin" pointList="-1440,-100,-1440,-100" />
+
+<item itemtype="Connector" uid="Connector-106" startpinid="Hd44780-35-PinRS" endpinid="p16F877-1-PORTD2" pointList="-1212,-88,-1212,80,-1284,80" />
+
+<item itemtype="Connector" uid="Connector-107" startpinid="Hd44780-35-PinRW" endpinid="Ground-19-Gnd" pointList="-1204,-88,-1204,-56,-1232,-56" />
+
+<item itemtype="Connector" uid="Connector-108" startpinid="Hd44780-35-PinEn" endpinid="p16F877-1-PORTD3" pointList="-1196,-88,-1196,72,-1284,72" />
+
+<item itemtype="Connector" uid="Connector-109" startpinid="Hd44780-35-dataPin4" endpinid="p16F877-1-PORTD4" pointList="-1156,-88,-1156,32,-1284,32" />
+
+<item itemtype="Connector" uid="Connector-110" startpinid="Hd44780-35-dataPin5" endpinid="p16F877-1-PORTD5" pointList="-1148,-88,-1148,24,-1284,24" />
+
+<item itemtype="Connector" uid="Connector-111" startpinid="Hd44780-35-dataPin6" endpinid="p16F877-1-PORTD6" pointList="-1140,-88,-1140,16,-1284,16" />
+
+<item itemtype="Connector" uid="Connector-112" startpinid="Hd44780-35-dataPin7" endpinid="p16F877-1-PORTD7" pointList="-1132,-88,-1132,8,-1284,8" />
+
+<item itemtype="Connector" uid="Connector-119" startpinid="Node-38-1" endpinid="Probe-36-inpin" pointList="-1372,-72,-1372,-96" />
+
+<item itemtype="Connector" uid="Connector-120" startpinid="p16F877-1-MCLR" endpinid="Node-38-0" pointList="-1348,-72,-1372,-72" />
+
+<item itemtype="Connector" uid="Connector-123" startpinid="Node-40-1" endpinid="Switch-39-pinP0" pointList="-1396,-72,-1396,-52" />
+
+<item itemtype="Connector" uid="Connector-124" startpinid="Node-38-2" endpinid="Node-40-0" pointList="-1372,-72,-1396,-72" />
+
+<item itemtype="Connector" uid="Connector-125" startpinid="Node-40-2" endpinid="Resistor-29-rPin" pointList="-1396,-72,-1396,-100,-1408,-100" />
+
+<item itemtype="Connector" uid="Connector-126" startpinid="Switch-39-switch0pinN" endpinid="Ground-32-Gnd" pointList="-1396,-20,-1396,-8" />
+
+</circuit>
