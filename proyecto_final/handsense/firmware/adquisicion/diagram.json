@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "author": "Alex Díaz y María José Córdova",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "flex",
+      "top": -20,
+      "left": 230,
+      "attrs": {
+        "value": "0"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "contact",
+      "top": 150,
+      "left": 230,
+      "attrs": {
+        "value": "0"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX0",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX0",
+      "$serialMonitor:TX",
+      "",
+      []
+    ],
+    [
+      "flex:VCC",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "flex:GND",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "flex:SIG",
+      "esp:34",
+      "green",
+      []
+    ],
+    [
+      "contact:VCC",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "contact:GND",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "contact:SIG",
+      "esp:35",
+      "green",
+      []
+    ]
+  ]
+}
