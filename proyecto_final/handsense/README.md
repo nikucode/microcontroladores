@@ -9,6 +9,7 @@ HandSense es un prototipo experimental para observar ejercicios simples de mano 
 - [Plan de trabajo](PLAN_DE_TRABAJO.md): requisitos y pruebas previstos para el prototipo.
 - [Investigación de antecedentes, novedad y pivotes](investigacion/2026-10-28_antecedentes_novedad_y_pivotes.md): comparación con publicaciones, patentes y productos; propuesta de ajuste.
 - [Especificación experimental](investigacion/2026-10-28_especificacion_experimental.md): tarea elegida para investigar, hipótesis, arquitectura provisional y pruebas de decisión.
+- [Ruta sin hardware](RUTA_SIN_HARDWARE.md): herramientas, pasos de simulación y evidencia que se puede producir antes del montaje físico.
 - [Investigación previa](investigacion/README.md): auditorías técnicas y materiales del curso.
 
 ## Estado
