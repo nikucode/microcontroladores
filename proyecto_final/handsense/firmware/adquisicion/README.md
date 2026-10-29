@@ -1,10 +1,12 @@
 # Primera adquisición de HandSense
 
-Estado: archivos preparados para Wokwi; todavía no ejecutados en el simulador ni en una placa física.
+Estado: ejecución en Wokwi observada en grabación del equipo; sin prueba en placa física.
 
 Revisión del 29 de octubre: la grabación del equipo confirma que el programa ejecuta y transmite datos. Se detectaron nombres incorrectos de terminales en el diagrama inicial (`esp:34` y `esp:35`); corregidos a `esp:D34` y `esp:D35` según la [definición oficial de la placa](https://github.com/wokwi/wokwi-boards/blob/main/boards/esp32-devkit-v1/board.json). La adquisición con el circuito corregido sigue pendiente de comprobar.
 
-Para usar el gráfico, cambiar `PLOTTER_MODE` a `true` en el sketch y reiniciar. Este modo envía solamente las dos lecturas ADC con etiquetas. Con `false`, conserva el CSV para registro: no graficarlo directamente, porque la columna de tiempo aumenta continuamente y domina la escala.
+Para usar el gráfico, mantener `PLOTTER_MODE` en `true` (valor inicial) y reiniciar. Este modo envía solamente las dos lecturas ADC con etiquetas. Con `false`, conserva el CSV para registro: no graficarlo directamente, porque la columna de tiempo aumenta continuamente y domina la escala.
+
+Segunda grabación (`screenrecording-2026-10-29_00-17-40.mp4`): se observa flexión fija en 4095 mientras contacto pasa de 1473 a 32; posteriormente contacto permanece en 3987 mientras flexión cambia (por ejemplo, 652 y 849). Esto aporta evidencia visual de respuesta independiente de ambos canales en simulación. No sustituye el CSV completo ni las pruebas con sensores. La grabación todavía usa salida CSV; el modo gráfico de dos señales queda pendiente de observar.
 
 ## Ejecutar
 

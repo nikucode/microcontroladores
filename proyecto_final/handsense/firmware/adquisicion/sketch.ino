@@ -2,7 +2,7 @@
 // Los potenciómetros representan entradas eléctricas, no sensores físicos.
 constexpr int FLEX_PIN = 34;
 constexpr int CONTACT_PIN = 35;
-constexpr bool PLOTTER_MODE = false; // true: graficar solo las dos entradas ADC
+constexpr bool PLOTTER_MODE = true; // false: guardar CSV con tiempo y porcentajes
 constexpr unsigned long SAMPLE_MS = 20; // 50 muestras por segundo
 unsigned long lastSample = 0;
 
