@@ -42,6 +42,8 @@ LED1 indica el estado definido para la demostración. LED2 representa provisiona
 
 Diseñar primero una página web sencilla que muestre los datos de prueba: flexión relativa, contacto relativo, estado, repeticiones completas e intentos incompletos. Después conectar el firmware a la página. En Wokwi la simulación WiFi existe, pero [abrir desde un navegador un servidor HTTP dentro del ESP32 simulado requiere el IoT Gateway](https://docs.wokwi.com/guides/esp32-wifi); no hacer depender la validación inicial de ese acceso. La extensión [Wokwi para VS Code incluye una pasarela local](https://docs.wokwi.com/vscode/project-config) si el equipo decide usarla.
 
+**Avance del 28 de octubre de 2026:** la [app de demostración](app/README.md) ya muestra escenarios simulados y documenta el [contrato HTTP](app/PROTOCOLO.md). La conexión real con el ESP32 sigue pendiente de firmware y hardware.
+
 Probar almacenamiento de parámetros de calibración y reinicio en un módulo separado. Guardar solo al cambiar parámetros, no cada muestra.
 
 **Cierre:** dashboard con datos de prueba y prueba de persistencia documentada. El enlace inalámbrico completo se marca «simulado» hasta verificarlo en el dispositivo real.

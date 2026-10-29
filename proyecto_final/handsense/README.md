@@ -10,6 +10,7 @@ HandSense es un prototipo experimental para observar ejercicios simples de mano 
 - [Investigación de antecedentes, novedad y pivotes](investigacion/2026-10-28_antecedentes_novedad_y_pivotes.md): comparación con publicaciones, patentes y productos; propuesta de ajuste.
 - [Especificación experimental](investigacion/2026-10-28_especificacion_experimental.md): tarea elegida para investigar, hipótesis, arquitectura provisional y pruebas de decisión.
 - [Ruta sin hardware](RUTA_SIN_HARDWARE.md): herramientas, pasos de simulación y evidencia que se puede producir antes del montaje físico.
+- [App web de demostración](app/README.md): panel accesible con datos simulados y contrato HTTP previsto para conectar el ESP32.
 - [Investigación previa](investigacion/README.md): auditorías técnicas y materiales del curso.
 
 ## Estado

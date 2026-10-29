@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f1ea">
+    <title>HandSense · Panel de prueba</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#principal">Saltar al contenido</a>
+    <div class="page-shell">
+      <header class="site-header">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span>HandSense <small>laboratorio</small></span></div>
+        <span class="course-label">Proyecto final · Microcontroladores</span>
+      </header>
+
+      <main id="principal">
+        <section class="hero" aria-labelledby="titulo">
+          <div>
+            <p class="eyebrow">01 / Interfaz experimental</p>
+            <h1 id="titulo">Una pinza, dos señales, <em>una decisión visible.</em></h1>
+            <p class="intro">Observa cómo se combinan flexión y contacto para contar una repetición completa. Este panel muestra el estado y explica cada resultado.</p>
+          </div>
+          <div class="hero-art" aria-hidden="true"><span class="art-circle art-circle-one"></span><span class="art-circle art-circle-two"></span><span class="art-dot"></span></div>
+        </section>
+
+        <section class="connection-bar" aria-labelledby="origen-titulo">
+          <div>
+            <p class="section-kicker" id="origen-titulo">Origen de datos</p>
+            <p class="connection-description" id="connection-description">Demostración con señales simuladas. No son mediciones físicas.</p>
+          </div>
+          <fieldset class="mode-choice">
+            <legend class="sr-only">Seleccionar origen de datos</legend>
+            <label><input type="radio" name="mode" value="demo" checked><span>Demostración</span></label>
+            <label><input type="radio" name="mode" value="device"><span>ESP32</span></label>
+          </fieldset>
+        </section>
+
+        <div class="dashboard-grid">
+          <section class="card signal-card" aria-labelledby="senales-titulo">
+            <div class="card-heading"><div><p class="section-kicker">02 / Entradas</p><h2 id="senales-titulo">Señales relativas</h2></div><span class="card-note">0–100 %</span></div>
+            <p class="helper">Porcentajes relativos a la calibración del prototipo; no representan ángulo ni fuerza clínica.</p>
+            <div class="signal-row"><div class="signal-label"><span>Flexión del índice</span><strong id="flex-value">0 %</strong></div><div class="track" role="meter" aria-label="Flexión relativa del índice" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="flex-meter"><span id="flex-fill" class="fill fill-flex"></span></div></div>
+            <div class="signal-row"><div class="signal-label"><span>Contacto de pinza</span><strong id="contact-value">0 %</strong></div><div class="track" role="meter" aria-label="Contacto relativo de pinza" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="contact-meter"><span id="contact-fill" class="fill fill-contact"></span></div></div>
+            <p class="calibration" id="calibration">Calibración: lista para demostración</p>
+          </section>
+
+          <section class="card state-card" aria-labelledby="estado-titulo">
+            <div class="card-heading"><div><p class="section-kicker">03 / Interpretación</p><h2 id="estado-titulo">Estado del gesto</h2></div><span class="state-icon" aria-hidden="true">◎</span></div>
+            <div class="state-display"><span class="state-pill" id="state-label">En reposo</span><p id="state-description">Esperando flexión y contacto.</p></div>
+            <div class="result-box"><span>Último resultado</span><strong id="event-label">Todavía no hay intentos</strong><p id="event-description">Elige una prueba para ver cómo responde el panel.</p></div>
+          </section>
+
+          <section class="card count-card" aria-labelledby="conteo-titulo">
+            <div class="card-heading"><div><p class="section-kicker">04 / Registro</p><h2 id="conteo-titulo">Sesión actual</h2></div></div>
+            <div class="counts"><div><strong id="valid-count">0</strong><span>Repeticiones completas</span></div><div><strong id="incomplete-count">0</strong><span>Intentos incompletos</span></div></div>
+            <p class="helper">El conteo de esta demo se reinicia al recargar la página.</p>
+          </section>
+
+          <section class="card controls-card" aria-labelledby="pruebas-titulo">
+            <div class="card-heading"><div><p class="section-kicker">05 / Explorar</p><h2 id="pruebas-titulo">Pruebas simuladas</h2></div></div>
+            <p class="helper">Cada botón reproduce una secuencia de ejemplo. Puedes comparar qué sucede cuando falta una señal o la liberación.</p>
+            <div class="scenario-grid" id="scenarios">
+              <button type="button" data-scenario="complete"><span class="button-symbol" aria-hidden="true">↗</span><span>Pinza completa<small>Flexión + contacto + liberación</small></span></button>
+              <button type="button" data-scenario="flex"><span class="button-symbol" aria-hidden="true">⌁</span><span>Solo flexión<small>Falta contacto</small></span></button>
+              <button type="button" data-scenario="contact"><span class="button-symbol" aria-hidden="true">○</span><span>Solo contacto<small>Falta flexión suficiente</small></span></button>
+              <button type="button" data-scenario="hold"><span class="button-symbol" aria-hidden="true">▣</span><span>Contacto sostenido<small>Falta liberación</small></span></button>
+              <button type="button" data-scenario="error"><span class="button-symbol" aria-hidden="true">!</span><span>Señal no confiable<small>El conteo se bloquea</small></span></button>
+            </div>
+            <div class="control-footer"><button type="button" class="text-button" id="reset-button">Reiniciar sesión</button><button type="button" class="text-button" id="calibrate-button">Solicitar calibración</button></div>
+          </section>
+        </div>
+
+        <section class="settings" aria-labelledby="accesibilidad-titulo">
+          <div><p class="section-kicker">06 / Preferencias</p><h2 id="accesibilidad-titulo">Accesibilidad</h2><p>Estas opciones afectan esta página y se guardan en este navegador.</p></div>
+          <div class="settings-controls"><label><input type="checkbox" id="large-text"> Texto grande</label><label><input type="checkbox" id="high-contrast"> Alto contraste</label><label><input type="checkbox" id="reduced-motion"> Reducir movimiento</label><label><input type="checkbox" id="announce-events" checked> Anunciar resultados al lector de pantalla</label></div>
+        </section>
+        <p class="sr-only" id="announcement" role="status" aria-live="polite" aria-atomic="true"></p>
+      </main>
+
+      <footer><span>HandSense · Alex Díaz y María José Córdova</span><span>Prototipo académico · No es un dispositivo clínico</span></footer>
+    </div>
+  </body>
+</html>
