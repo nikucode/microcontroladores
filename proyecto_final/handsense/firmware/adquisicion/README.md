@@ -8,6 +8,8 @@ Para usar el gráfico, mantener `PLOTTER_MODE` en `true` (valor inicial) y reini
 
 Segunda grabación (`screenrecording-2026-10-29_00-17-40.mp4`): se observa flexión fija en 4095 mientras contacto pasa de 1473 a 32; posteriormente contacto permanece en 3987 mientras flexión cambia (por ejemplo, 652 y 849). Esto aporta evidencia visual de respuesta independiente de ambos canales en simulación. No sustituye el CSV completo ni las pruebas con sensores. La grabación todavía usa salida CSV; el modo gráfico de dos señales queda pendiente de observar.
 
+Tercera grabación (`screenrecording-2026-10-29_00-28-27.mp4`): el modo gráfico muestra dos curvas separadas. Cada potenciómetro modifica su propia curva y hay intervalos donde una señal queda fija mientras la otra cambia. Con esto se cumple la comprobación funcional de adquisición independiente en Wokwi.
+
 ## Ejecutar
 
 1. Crear un proyecto [ESP32 en Wokwi](https://wokwi.com/projects/new/esp32).

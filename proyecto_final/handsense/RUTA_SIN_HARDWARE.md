@@ -26,11 +26,15 @@ Crear un proyecto ESP32 con POT1 = flexión simulada y POT2 = contacto simulado,
 
 **Cierre:** captura del circuito, código y registro de al menos cinco pares de lecturas representativos. No convertir aún esos números a grados o newtons.
 
+**Avance del 29 de octubre de 2026:** tres grabaciones confirman la respuesta independiente de las dos entradas en Wokwi. El registro numérico de cinco configuraciones todavía debe completarse.
+
 ### Paso 3 — lógica sin interfaz
 
 Implementar primero un contador de referencia que usa solo flexión. Luego implementar estados que exigen flexión, contacto y liberación. Probar secuencias manuales con los potenciómetros y registrar cuándo incrementa cada contador. Añadir histéresis para evitar múltiples conteos mientras se mantiene una posición.
 
 **Cierre:** ambos algoritmos reaccionan de forma predecible a la misma tabla de casos; los errores quedan anotados.
+
+**Preparado:** la [segunda simulación](firmware/logica_gesto/README.md) implementa el contador de referencia por flexión y el detector por fusión, junto con filtro, histéresis y casos de prueba. Falta ejecutarla y registrar sus resultados en Wokwi.
 
 ### Paso 4 — salidas simuladas
 

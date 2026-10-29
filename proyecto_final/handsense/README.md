@@ -15,7 +15,9 @@ HandSense es un prototipo experimental para observar ejercicios simples de mano 
 
 ## Estado
 
-La [primera adquisición en Wokwi](firmware/adquisicion/README.md) incluye circuito con dos potenciómetros y firmware con salida CSV. Está preparada para ejecutar; sus resultados siguen pendientes.
+La [primera adquisición en Wokwi](firmware/adquisicion/README.md) incluye circuito con dos potenciómetros y firmware con salida CSV. Tres grabaciones documentan la puesta en marcha, la corrección de terminales y la respuesta independiente de ambos canales.
+
+La [segunda simulación](firmware/logica_gesto/README.md) agrega filtro, histéresis, estados, conteo y LED para intentos completos e incompletos.
 
 La arquitectura propuesta usa ESP32. Los documentos iniciales mencionan una duda sobre su aceptación en la asignatura; se conservaron como registro histórico. La propuesta que incluía ESP32 fue entregada y evaluada con nota 7, según el equipo. Aún no hay evidencia de sensores, motor ni dashboard validados físicamente.
 

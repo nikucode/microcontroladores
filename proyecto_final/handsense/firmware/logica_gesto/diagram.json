@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "author": "Alex Díaz y María José Córdova",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "flex", "top": -20, "left": 230, "attrs": { "value": "0" } },
+    { "type": "wokwi-potentiometer", "id": "contact", "top": 150, "left": 230, "attrs": { "value": "0" } },
+    { "type": "wokwi-led", "id": "valid", "top": 285, "left": 40, "attrs": { "color": "green", "label": "Completa" } },
+    { "type": "wokwi-resistor", "id": "rValid", "top": 314, "left": 112, "rotate": 90, "attrs": { "value": "220" } },
+    { "type": "wokwi-led", "id": "incomplete", "top": 285, "left": 215, "attrs": { "color": "orange", "label": "Incompleta" } },
+    { "type": "wokwi-resistor", "id": "rIncomplete", "top": 314, "left": 287, "rotate": 90, "attrs": { "value": "220" } }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "flex:VCC", "esp:3V3", "red", [] ],
+    [ "flex:GND", "esp:GND.1", "black", [] ],
+    [ "flex:SIG", "esp:D34", "green", [] ],
+    [ "contact:VCC", "esp:3V3", "red", [] ],
+    [ "contact:GND", "esp:GND.1", "black", [] ],
+    [ "contact:SIG", "esp:D35", "green", [] ],
+    [ "esp:D18", "valid:A", "green", [] ],
+    [ "valid:C", "rValid:1", "green", [] ],
+    [ "rValid:2", "esp:GND.2", "black", [] ],
+    [ "esp:D19", "incomplete:A", "orange", [] ],
+    [ "incomplete:C", "rIncomplete:1", "orange", [] ],
+    [ "rIncomplete:2", "esp:GND.2", "black", [] ]
+  ],
+  "serialMonitor": { "display": "terminal" },
+  "dependencies": {}
+}
