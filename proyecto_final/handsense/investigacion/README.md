@@ -7,6 +7,7 @@ Este directorio conserva fuentes, análisis y decisiones en orden temporal. Los 
 | [Auditoría técnica inicial](auditoria_tecnica_inicial.md) | Riesgos del boceto, sensores, actuadores, comunicación y validación | Histórica; contiene preguntas ya resueltas o todavía abiertas |
 | [Auditoría de materiales del curso](auditoria_materiales_curso.md) | Evidencia de aprendizaje y brechas en PIC, ADC, EEPROM y comunicación | Histórica; algunos estados cambiaron después |
 | [Antecedentes, novedad y pivotes](2026-10-28_antecedentes_novedad_y_pivotes.md) | Revisión exploratoria de papers, productos y patentes; recomendación de enfoque | Actual al 28-10-2026 |
+| [Especificación experimental](2026-10-28_especificacion_experimental.md) | Pregunta técnica, tarea, comparación A/B y puertas de avance | Propuesta al 28-10-2026; pendiente de prueba |
 
 ## Criterio para futuras investigaciones
 
