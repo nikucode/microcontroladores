@@ -17,6 +17,12 @@ El repositorio forma parte del trabajo colaborativo desarrollado por **nikucode*
 
 ## Contenido del repositorio
 
+### Proyecto final: HandSense
+
+La carpeta [proyecto_final/handsense](proyecto_final/handsense/README.md) reúne el plan y las investigaciones del proyecto de monitoreo experimental de ejercicios de mano. Incluye una revisión de publicaciones, productos y patentes, y se ampliará con las decisiones y pruebas del prototipo.
+
+---
+
 ### Trabajo Colaborativo N°1
 
 Primer conjunto de ejercicios enfocados principalmente en programación en lenguaje C y resolución de problemas.
