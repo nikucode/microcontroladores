@@ -8,6 +8,7 @@ constexpr int ENTER_THRESHOLD = 2457;  // 60 % del ADC, solo para simulación
 constexpr int EXIT_THRESHOLD = 1433;   // 35 %: histéresis contra oscilaciones
 constexpr uint32_t ATTEMPT_TIMEOUT_MS = 3000;
 constexpr uint32_t SAMPLE_MS = 20;
+constexpr uint32_t REPORT_INTERVAL_MS = 1000;
 constexpr uint32_t LED_PULSE_MS = 400;
 constexpr int FILTER_SAMPLES = 5;
 
@@ -20,8 +21,13 @@ int bufferIndex = 0;
 long flexSum = 0;
 long contactSum = 0;
 uint32_t lastSample = 0;
+uint32_t lastReport = 0;
 uint32_t validLedUntil = 0;
 uint32_t incompleteLedUntil = 0;
+GestureState lastReportedState = GestureState::REPOSO;
+uint32_t lastReportedRepetitions = 0;
+uint32_t lastReportedFlexOnly = 0;
+uint32_t lastReportedIncomplete = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -30,7 +36,7 @@ void setup() {
   pinMode(CONTACT_PIN, INPUT);
   pinMode(VALID_LED_PIN, OUTPUT);
   pinMode(INCOMPLETE_LED_PIN, OUTPUT);
-  Serial.println("flex_adc contacto_adc estado evento fusion flex_solo incompletas");
+  Serial.println("F=flexion C=contacto estado evento fusion flex_solo inc");
 }
 
 void loop() {
@@ -58,9 +64,24 @@ void loop() {
   else if (result.event != GestureEvent::NINGUNO)
     incompleteLedUntil = now + LED_PULSE_MS;
 
-  Serial.printf("%d %d %s %s %lu %lu %lu\n", flex, contact,
-                stateName(result.state), eventName(result.event),
-                static_cast<unsigned long>(result.repetitions),
-                static_cast<unsigned long>(flexOnlyCounter.count()),
-                static_cast<unsigned long>(result.incomplete));
+  const uint32_t flexOnly = flexOnlyCounter.count();
+  const bool stateChanged = result.state != lastReportedState;
+  const bool countsChanged = result.repetitions != lastReportedRepetitions ||
+                             flexOnly != lastReportedFlexOnly ||
+                             result.incomplete != lastReportedIncomplete;
+  const bool eventOccurred = result.event != GestureEvent::NINGUNO;
+  const bool periodicReport = now - lastReport >= REPORT_INTERVAL_MS;
+
+  if (stateChanged || countsChanged || eventOccurred || periodicReport) {
+    Serial.printf("F=%d C=%d estado=%s evento=%s fusion=%lu flex_solo=%lu inc=%lu\n",
+                  flex, contact, stateName(result.state), eventName(result.event),
+                  static_cast<unsigned long>(result.repetitions),
+                  static_cast<unsigned long>(flexOnly),
+                  static_cast<unsigned long>(result.incomplete));
+    lastReport = now;
+    lastReportedState = result.state;
+    lastReportedRepetitions = result.repetitions;
+    lastReportedFlexOnly = flexOnly;
+    lastReportedIncomplete = result.incomplete;
+  }
 }

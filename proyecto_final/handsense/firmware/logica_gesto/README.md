@@ -8,6 +8,8 @@ Una repetición se cuenta únicamente cuando hubo flexión y contacto y luego am
 
 El monitor serie presenta dos contadores sobre las mismas entradas: `fusion` exige la secuencia completa y `flex_solo` cuenta cada ciclo de flexión. En el ensayo «solo flexión», `flex_solo` aumenta y `fusion` no; este es el caso básico para comparar los algoritmos A y B planteados en la investigación.
 
+El ESP32 sigue leyendo y procesando las entradas cada 20 ms, pero el monitor serie ahora muestra una línea solo cuando cambia el estado, ocurre un evento, cambia un contador o pasa un segundo. Así las transiciones se ven al momento y las lecturas periódicas quedan a una línea por segundo. Las columnas aparecen como `F` (flexión), `C` (contacto), `estado`, `evento`, `fusion`, `flex_solo` e `inc` (incompletas).
+
 ## Probar en Wokwi
 
 1. Crear otro proyecto ESP32 o reemplazar los archivos del proyecto de adquisición por `sketch.ino`, `gesture_logic.h` y `diagram.json` de esta carpeta.
