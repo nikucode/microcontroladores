@@ -1,0 +1,40 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{booktabs,longtable,hyperref}
+\title{HandSense: informe de avances\\Prototipo experimental de monitoreo de pinza}
+\author{Alex Díaz Canales \and María José Córdova}
+\date{10 de noviembre de 2026}
+\begin{document}\maketitle
+\section{Problema y alcance}
+Nuestro objetivo es observar una pinza pulgar--índice mediante flexión y contacto relativos, contar repeticiones y explicar intentos incompletos. Construiremos un prototipo con dos entradas analógicas, LED, motor vibrador, memoria no volátil y dashboard inalámbrico. La propuesta es experimental: aún no hemos demostrado utilidad clínica ni uso doméstico independiente.
+\section{Antecedentes y aporte propuesto}
+SensorE ya combina medición de flexión y fuerza en un wearable \cite{sensore}. Por eso nuestro aporte propuesto se centra en una tarea explícita, conteo interpretable y evaluación del costo y facilidad de colocación. RehabBuddy muestra que la calibración asistida y los problemas técnicos limitan conclusiones sobre uso independiente \cite{rehab}. Estas fuentes orientan decisiones; sus resultados no son resultados de HandSense.
+\section{Arquitectura y componentes}
+Dos sensores resistivos se conectarán mediante divisores a entradas ADC. El ESP32 procesará las señales y manejará LED, driver de motor y comunicación. La app mostrará estados y lecturas relativas. Los modelos exactos, resistencias, corriente del motor y costo final están pendientes; la tabla BOM del repositorio registra estos campos sin inventar precios. La guía FSR indica dependencia de la geometría y distribución de fuerza \cite{fsr}.
+\section{Estado observado}
+\begin{longtable}{p{.24\textwidth}p{.65\textwidth}}\toprule
+Bloque & Evidencia y pendiente\\\midrule
+Adquisición & Potenciómetros en Wokwi; faltan sensores físicos.\\
+Algoritmo & Cinco pruebas locales; falta evaluación física etiquetada.\\
+App & Datos simulados y contrato HTTP; falta enlace real.\\
+Integración & ESPERA\_REPOSO existe en firmware pero no en la validación de la app.\\
+Memoria y motor & Pendientes de implementación y prueba física.\\
+Soporte & Pendiente de prueba de colocación y comodidad.\\\bottomrule
+\end{longtable}
+\section{Calibración y método experimental}
+Registraremos reposo y gestos de desarrollo para determinar polaridad, rango y ruido. Los parámetros se fijarán antes de evaluar nuevos ensayos. Compararemos conteo por flexión y por fusión sobre las mismas señales, con etiqueta manual. Informaremos falsos positivos, falsos negativos y tamaño real de muestra. Repetiremos colocación y verificaremos persistencia tras reinicio. El protocolo detallado y la plantilla vacía están en validacion/.
+\section{Resultados y limitaciones}
+Las pruebas locales verifican reglas de software. No prueban sensores, electrónica, conexión inalámbrica, comodidad ni efectos terapéuticos. Las mediciones físicas, gráficos y fotografías quedan pendientes; se incorporarán con fecha, montaje y versión del código. No se incluyen fotografías reconstruidas ni datos sintéticos como resultados físicos.
+\section{Planificación y presupuesto}
+La Gantt operativa está en SEGUIMIENTO\_NOVIEMBRE.md. Se conserva como antecedente la carta de septiembre. El syllabus ubica la evaluación en la semana del 23 de noviembre; el día 25 está por confirmar. La meta interna es estar listos el 23. Alex lidera software y pruebas; Cote lidera materiales y soporte, sujeto a acuerdo del equipo. La integración y defensa se realizan juntos. El presupuesto final depende de las piezas confirmadas, envío, materiales y reposición.
+\section{Accesibilidad y futuro}
+Mediremos colocación, ayuda necesaria, comprensión de mensajes y percepción de vibración. El costo bajo y la facilidad de uso son hipótesis que deben verificarse. Después de la entrega proponemos co-diseño con usuarios y terapeutas, pruebas de confiabilidad y análisis de mantenimiento. Usuario, comprador y pagador podrían ser distintos; no contamos aún con validación de demanda ni interés inversor documentado.
+\begin{thebibliography}{9}
+\bibitem{sensore} Bates et al. (2026). Multimodal measurement of hand function with the SensorE Exoskeleton. \url{https://doi.org/10.1088/2057-1976/ae3e98}.
+\bibitem{rehab} A feasibility study to empower patients with individualised physical rehabilitation through wearable technology: RehabBuddy (2026). \url{https://pubmed.ncbi.nlm.nih.gov/42964283/}.
+\bibitem{fsr} Interlink Electronics. FSR Integration Guide. \url{https://www.interlinkelectronics.com/downloads/integration-guides/fsr-400-series-integration-guide.pdf}.
+\end{thebibliography}
+\end{document}

@@ -6,6 +6,9 @@ HandSense es un prototipo experimental para observar ejercicios simples de mano 
 
 ## Documentos
 
+- [Informe de avances PDF](informe/avance.pdf) y [fuente LaTeX](informe/avance.tex).
+- [Protocolo y matriz de cierre](validacion/PROTOCOLO_Y_CIERRE.md), [BOM pendiente](validacion/BOM.csv) y [plantilla de ensayos](validacion/ensayos.csv).
+
 - [Revisión de evidencia para la entrega](investigacion/2026-11-10_revision_para_entrega.md): qué está demostrado, antecedentes recientes, hipótesis de aporte y riesgos.
 - [Prompt maestro de planificación](PROMPT_MAESTRO_PLANIFICACION.md): instrucciones reutilizables para actualizar plan, informe, carta Gantt y visión futura con evidencia.
 - [Seguimiento de noviembre](SEGUIMIENTO_NOVIEMBRE.md): carta Gantt operativa y bitácora que se actualizan con cada sesión.

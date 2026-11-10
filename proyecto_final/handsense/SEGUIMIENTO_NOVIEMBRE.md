@@ -49,3 +49,11 @@ Hitos Gantt actualizados:
 **Decisión:** terminar internamente el 23, usar un solo prototipo, cerrar placa y compras con especificaciones reales, y actualizar bitácora/Gantt junto con cada avance técnico.
 
 **Siguiente paso:** Alex registra `SIN_FLEXION` en Wokwi y comienza el enlace firmware–dashboard; Cote confirma inventario y enlaces/fechas de las piezas cotizadas. Es una propuesta de reparto que ambos pueden ajustar.
+
+## Entrada 04 — Ejecución del prompt, 10 de noviembre de 2026
+
+Se cotejó el detector con el contrato y la validación de la app. Se identificó la incompatibilidad de ESPERA_REPOSO y que el bloqueo por señal inválida sigue pendiente. Se prepararon protocolo, matriz de cierre, plantilla de ensayos, BOM sin cotizaciones inventadas e informe LaTeX/PDF. H8 avanza en documentación; H4 continúa pendiente de integración real. Las fuentes recientes se verificaron con páginas académicas y documentación oficial de Espressif.
+
+Estimaciones iniciales de esfuerzo activo, pendientes de ajustar a la disponibilidad del equipo: H1 1–2 h; H2 2–4 h; H3 1–2 h; H4 6–10 h; H5 4–8 h; H6 2–4 h; H7 3–5 h; H8 4–6 h repartidas; H9 1–2 h. Total estimado: 24–43 horas-persona, sin contar envíos ni aprendizaje adicional. Reservar margen de corrección y revisar capacidad real antes de comprometer fechas.
+
+El camino crítico físico pasa por recepción → circuito → calibración → integración → ensayos. El software puede avanzar en paralelo con entradas simuladas. Si no llegan sensores o motor, Wokwi queda como evidencia parcial y no satisface la demostración física. Si solo falla el soporte corporal, el montaje de mesa conserva la prueba electrónica pero no demuestra ergonomía vestible.
