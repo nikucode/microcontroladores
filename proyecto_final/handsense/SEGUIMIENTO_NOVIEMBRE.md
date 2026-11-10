@@ -57,3 +57,7 @@ Se cotejó el detector con el contrato y la validación de la app. Se identific�
 Estimaciones iniciales de esfuerzo activo, pendientes de ajustar a la disponibilidad del equipo: H1 1–2 h; H2 2–4 h; H3 1–2 h; H4 6–10 h; H5 4–8 h; H6 2–4 h; H7 3–5 h; H8 4–6 h repartidas; H9 1–2 h. Total estimado: 24–43 horas-persona, sin contar envíos ni aprendizaje adicional. Reservar margen de corrección y revisar capacidad real antes de comprometer fechas.
 
 El camino crítico físico pasa por recepción → circuito → calibración → integración → ensayos. El software puede avanzar en paralelo con entradas simuladas. Si no llegan sensores o motor, Wokwi queda como evidencia parcial y no satisface la demostración física. Si solo falla el soporte corporal, el montaje de mesa conserva la prueba electrónica pero no demuestra ergonomía vestible.
+
+## Entrada 05 — Compras y guía didáctica, 10 de noviembre de 2026
+
+Alex confirma compra de ESP32 y sensores por AliExpress y próxima visita a San Diego para complementos. H1 avanza en compra; modelos y recepción siguen pendientes. Se amplió el informe con conceptos del ramo, recorrido de la señal, reproducción de Wokwi, lectura del código y criterios de comprobación. Se tomó como referencia pedagógica el informe del Desafío PIC. La revisión no encontró licencia explícita; no se añadió ninguna sin decisión de los autores.

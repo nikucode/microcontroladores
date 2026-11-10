@@ -1,7 +1,7 @@
 elemento,cantidad_prevista,modelo_confirmado,precio_total_clp,fuente,fecha_cotizacion,fecha_recepcion,estado
-Placa ESP32,1,,,,,,pendiente
-Sensor flexivo,1,,,,,,pendiente
-FSR,1,,,,,,pendiente
+Placa ESP32,1,,,AliExpress (informado por Alex),,,comprado; modelo y recepcion por confirmar
+Sensor flexivo,1,,,AliExpress (informado por Alex),,,comprado; modelo y recepcion por confirmar
+FSR,1,,,AliExpress (informado por Alex),,,comprado; modelo y recepcion por confirmar
 Motor,1,,,,,,pendiente
 Driver y proteccion,por definir,,,,,,pendiente
 Resistencias y filtrado,por definir,,,,,,pendiente

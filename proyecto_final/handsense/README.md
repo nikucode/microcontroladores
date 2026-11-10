@@ -29,3 +29,9 @@ La [segunda simulación](firmware/logica_gesto/README.md) agrega filtro, histér
 La arquitectura propuesta usa ESP32. Los documentos iniciales mencionan una duda sobre su aceptación en la asignatura; se conservaron como registro histórico. La propuesta que incluía ESP32 fue entregada y evaluada con nota 7, según el equipo. Aún no hay evidencia de sensores, motor ni dashboard validados físicamente.
 
 El proyecto se describe como un **prototipo experimental**, sin afirmar eficacia terapéutica ni mediciones clínicas de fuerza o ángulo.
+
+## Compras y licencia (actualización del 10 de noviembre)
+
+Alex informó que ESP32 y sensores se compraron por AliExpress. Faltan modelos exactos y fecha de recepción. El equipo planea comprar componentes complementarios en San Diego. Consultar la BOM antes de duplicar compras.
+
+No se encontró una licencia explícita en HandSense ni una licencia general del repositorio. La elección sigue pendiente de los autores; este registro no concede una licencia nueva.
