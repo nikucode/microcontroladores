@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initialData, validateData, scenarioSteps, applyDemoStep } from './data.js';
+import { initialData, validateData, scenarioSteps, applyDemoStep, readingStatus } from './data.js';
 
 test('la demostración distingue una pinza completa de intentos incompletos', () => {
   let data = initialData();
@@ -31,4 +31,17 @@ test('se rechazan datos incompatibles o fuera de rango del ESP32', () => {
   assert.throws(() => validateData({ ...valid, flexion_pct: 101 }), /flexion_pct/);
   assert.throws(() => validateData({ ...valid, estado: 'DESCONOCIDO' }), /Estado/);
   assert.throws(() => validateData({ ...valid, repeticiones: -1 }), /Conteo/);
+});
+
+test('el estado de espera del firmware es compatible con la app', () => {
+  assert.equal(validateData({ ...initialData(), estado: 'ESPERA_REPOSO' }).estado, 'ESPERA_REPOSO');
+});
+test('la conexión y calibración condicionan la interpretación sin alterar contadores', () => {
+  const data = { ...initialData(), repeticiones: 8 };
+  assert.equal(readingStatus(data, 'device', false).usable, false);
+  assert.equal(readingStatus(data, 'device', true).usable, true);
+  for (const calibracion of ['INVALIDA', 'PENDIENTE']) assert.equal(readingStatus({ ...data, calibracion }, 'device', true).usable, false);
+  assert.equal(readingStatus({ ...data, estado: 'ERROR_SENAL' }, 'demo', false).usable, false);
+  assert.equal(readingStatus(data, 'demo', false).title, 'Ejemplo simulado');
+  assert.equal(data.repeticiones, 8);
 });

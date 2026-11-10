@@ -13,7 +13,7 @@ Este protocolo se fija antes de medir hardware. Los criterios son objetivos de i
 
 ## Brechas del código que condicionan la integración
 
-- `gesture_logic.h` emite ESPERA_REPOSO; `app/data.js` solo admite REPOSO, FLEXION, CONTACTO, LIBERACION y ERROR_SENAL. Definir y probar una representación explícita antes de transmitir JSON.
+- Actualizado: la app admite ESPERA_REPOSO del firmware y lo explica. La compatibilidad está probada localmente; falta verificar transporte HTTP físico.
 - ERROR_SENAL y calibración inválida son escenarios de la app; el detector no implementa ese bloqueo todavía.
 - La regla actual recuerda haber visto flexión y contacto. Debe documentarse qué orden/solapamiento se acepta y probar contacto primero, flexión primero y entradas simultáneas.
 - Los 3 segundos y umbrales del sketch son provisionales. No utilizarlos como tiempo terapéutico ni umbral universal.

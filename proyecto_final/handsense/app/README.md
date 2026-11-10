@@ -21,3 +21,7 @@ Pruebas disponibles: pinza completa, solo flexión, solo contacto, contacto sost
 La app puede servirse desde el propio ESP32. En modo `ESP32`, consulta `GET /api/estado` cada segundo y envía acciones a `POST /api/acciones`. El contrato exacto está en [PROTOCOLO.md](PROTOCOLO.md). La app debe abrirse desde la dirección del ESP32 para que las rutas sean del mismo origen y funcionen sin CORS. El ESP32 continuará ejecutando la lógica de conteo y los avisos físicos si el navegador se desconecta.
 
 Esta versión no es una PWA instalable: una página servida por HTTP desde una IP local no cumple normalmente el requisito de contexto seguro para un *service worker*. Se podrá evaluar una versión instalable si aporta algo al proyecto.
+
+## Actualización de interfaz
+
+Ver [decisiones y evidencia](DECISIONES.md). La interfaz admite ESPERA_REPOSO y evita mostrar porcentajes como utilizables ante fallo de conexión, calibración o señal.

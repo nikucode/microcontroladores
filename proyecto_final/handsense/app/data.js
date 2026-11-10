@@ -18,7 +18,7 @@ export function validateData(value) {
   for (const key of ['repeticiones', 'incompletos']) {
     if (!Number.isSafeInteger(value[key]) || value[key] < 0) throw new Error(`Conteo inválido: ${key}.`);
   }
-  if (!['REPOSO', 'FLEXION', 'CONTACTO', 'LIBERACION', 'ERROR_SENAL'].includes(value.estado)) throw new Error('Estado desconocido.');
+  if (!['REPOSO', 'FLEXION', 'CONTACTO', 'LIBERACION', 'ESPERA_REPOSO', 'ERROR_SENAL'].includes(value.estado)) throw new Error('Estado desconocido.');
   if (!['LISTA', 'PENDIENTE', 'INVALIDA'].includes(value.calibracion)) throw new Error('Calibración desconocida.');
   if (!value.ultimo_evento || typeof value.ultimo_evento !== 'object' || typeof value.ultimo_evento.codigo !== 'string' || typeof value.ultimo_evento.detalle !== 'string') throw new Error('Último evento inválido.');
   return value;
@@ -65,4 +65,12 @@ export function applyDemoStep(data, step) {
     incompletos: data.incompletos + (step.incompletosDelta ?? 0),
     ultimo_evento: step.codigo ? { codigo: step.codigo, detalle: step.detalle } : data.ultimo_evento
   });
+}
+
+// La presentación no modifica el conteo que informa el dispositivo.
+export function readingStatus(data, mode, connected) {
+  if (mode === 'device' && !connected) return { usable: false, title: 'Esperando datos del ESP32', detail: 'Comprueba la conexión. Las lecturas anteriores no se muestran como actuales.' };
+  if (data.calibracion !== 'LISTA') return { usable: false, title: 'Revisar calibración', detail: 'No interpretes estos porcentajes hasta que el dispositivo confirme una calibración válida.' };
+  if (data.estado === 'ERROR_SENAL') return { usable: false, title: 'Revisar señal', detail: 'El dispositivo informa una señal no confiable. Revisa sensores y conexiones.' };
+  return { usable: true, title: mode === 'demo' ? 'Ejemplo simulado' : 'Datos recibidos del ESP32', detail: mode === 'demo' ? 'Explora las secuencias; estos valores no provienen de sensores físicos.' : 'Porcentajes relativos a la calibración del montaje.' };
 }

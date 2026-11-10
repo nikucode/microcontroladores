@@ -23,7 +23,7 @@
 }
 ```
 
-`timestamp_ms` es milisegundos desde Unix si el ESP32 tiene reloj sincronizado; si no lo tiene, usar milisegundos desde el arranque y documentarlo. La app actualmente no muestra este campo. `flexion_pct` y `contacto_pct` deben estar entre 0 y 100; `repeticiones` e `incompletos` son enteros no negativos. `estado` admite `REPOSO`, `FLEXION`, `CONTACTO`, `LIBERACION`, `ERROR_SENAL`. `calibracion` admite `LISTA`, `PENDIENTE`, `INVALIDA`. Los códigos actuales de `ultimo_evento` son `NINGUNO`, `COMPLETA`, `SIN_CONTACTO`, `SIN_FLEXION`, `SIN_LIBERACION`, `SENAL_NO_CONFIABLE`. `detalle` es una explicación breve y legible. El firmware podrá agregar campos sin romper la app; los cambios de significado o estructura requieren incrementar `schema`.
+`timestamp_ms` es milisegundos desde Unix si el ESP32 tiene reloj sincronizado; si no lo tiene, usar milisegundos desde el arranque y documentarlo. La app actualmente no muestra este campo. `flexion_pct` y `contacto_pct` deben estar entre 0 y 100; `repeticiones` e `incompletos` son enteros no negativos. `estado` admite `REPOSO`, `FLEXION`, `CONTACTO`, `LIBERACION`, `ESPERA_REPOSO`, `ERROR_SENAL`. `calibracion` admite `LISTA`, `PENDIENTE`, `INVALIDA`. Los códigos actuales de `ultimo_evento` son `NINGUNO`, `COMPLETA`, `SIN_CONTACTO`, `SIN_FLEXION`, `SIN_LIBERACION`, `SENAL_NO_CONFIABLE`. `detalle` es una explicación breve y legible. El firmware podrá agregar campos sin romper la app; los cambios de significado o estructura requieren incrementar `schema`.
 
 ## Enviar acciones
 
@@ -51,3 +51,7 @@ Respuesta esperada: HTTP 200 y `{"ok":true}`. Si la acción no puede ejecutarse,
 5. Probar desconexión/reconexión y concordancia entre app, LED, vibración y registro serie.
 
 La app no recibe datos personales ni los envía a un servidor externo. Evitar incluir nombre u otros datos identificables en el JSON mientras no sean necesarios.
+
+## Presentación de lecturas (10 de noviembre)
+
+ESPERA_REPOSO indica que el intento terminó y se espera liberar ambas entradas. La app oculta porcentajes cuando falta conexión, calibración válida o el firmware informa ERROR_SENAL. Esto no implementa bloqueo en el microcontrolador: ese requisito sigue pendiente. Tras reconectar, los contadores son los informados por el ESP32.

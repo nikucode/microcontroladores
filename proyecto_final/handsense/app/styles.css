@@ -580,3 +580,10 @@ footer span {
 }
 
 }
+
+#reading-status { padding: 14px 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--green-light); }
+#reading-status[data-kind="error"] { background: var(--orange-light); }
+.reading-guide { margin: 16px 0 22px; }
+.reading-guide summary { cursor: pointer; font-weight: 700; }
+.reading-guide summary:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+[hidden] { display: none !important; }

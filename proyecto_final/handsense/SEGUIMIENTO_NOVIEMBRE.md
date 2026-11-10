@@ -61,3 +61,7 @@ El camino crítico físico pasa por recepción → circuito → calibración →
 ## Entrada 05 — Compras y guía didáctica, 10 de noviembre de 2026
 
 Alex confirma compra de ESP32 y sensores por AliExpress y próxima visita a San Diego para complementos. H1 avanza en compra; modelos y recepción siguen pendientes. Se amplió el informe con conceptos del ramo, recorrido de la señal, reproducción de Wokwi, lectura del código y criterios de comprobación. Se tomó como referencia pedagógica el informe del Desafío PIC. La revisión no encontró licencia explícita; no se añadió ninguna sin decisión de los autores.
+
+## Entrada 06 — Integridad de la interfaz, 10 de noviembre de 2026
+
+Se resolvió en la app la incompatibilidad ESPERA_REPOSO. Se incorporaron presentación condicionada a conexión/calibración, mensajes accesibles y explicación desplegable. Las decisiones y fuentes están en app/DECISIONES.md. H4 avanza en contrato y presentación, pero el servidor ESP32, calibración física y persistencia continúan pendientes.

@@ -1,4 +1,4 @@
-import { initialData, validateData, scenarioSteps, applyDemoStep } from './data.js';
+import { initialData, validateData, scenarioSteps, applyDemoStep, readingStatus } from './data.js';
 
 const $ = (id) => document.getElementById(id);
 const stateNames = {
@@ -6,6 +6,7 @@ const stateNames = {
   FLEXION: ['Flexión detectada', 'Se observó flexión; falta confirmar contacto.'],
   CONTACTO: ['Contacto detectado', 'Se observó contacto; falta completar la liberación.'],
   LIBERACION: ['Liberación pendiente', 'El contacto terminó; falta volver a reposo.'],
+  ESPERA_REPOSO: ['Volver a reposo', 'El intento terminó. Suelta el contacto y vuelve a la posición inicial antes de comenzar otro.'],
   ERROR_SENAL: ['Señal no confiable', 'Se detuvo el conteo para evitar resultados incorrectos.']
 };
 const eventNames = {
@@ -21,6 +22,7 @@ const settingsIds = ['large-text', 'high-contrast', 'reduced-motion', 'announce-
 
 let data = initialData();
 let mode = 'demo';
+let connected = false;
 let runId = 0;
 let pollTimer;
 let lastAnnouncement = '';
@@ -32,22 +34,32 @@ function announce(message) {
 }
 
 function render() {
+  const status = readingStatus(data, mode, connected);
+  $('reading-status').textContent = `${status.title}. ${status.detail}`;
+  $('reading-status').dataset.kind = status.usable ? 'normal' : 'error';
   const flex = Math.round(data.flexion_pct);
   const contact = Math.round(data.contacto_pct);
-  $('flex-value').textContent = `${flex} %`;
-  $('contact-value').textContent = `${contact} %`;
-  $('flex-fill').style.width = `${flex}%`;
-  $('contact-fill').style.width = `${contact}%`;
+  $('flex-value').textContent = status.usable ? `${flex} %` : '—';
+  $('contact-value').textContent = status.usable ? `${contact} %` : '—';
+  $('flex-fill').style.width = `${status.usable ? flex : 0}%`;
+  $('contact-fill').style.width = `${status.usable ? contact : 0}%`;
   $('flex-meter').setAttribute('aria-valuenow', String(flex));
   $('contact-meter').setAttribute('aria-valuenow', String(contact));
-  $('state-label').textContent = stateNames[data.estado][0];
-  $('state-description').textContent = stateNames[data.estado][1];
+  for (const id of ['flex-meter', 'contact-meter']) {
+    $(id).hidden = !status.usable;
+  }
+  $('state-label').textContent = status.usable ? stateNames[data.estado][0] : status.title;
+  $('state-description').textContent = status.usable ? stateNames[data.estado][1] : status.detail;
   $('state-label').dataset.kind = data.estado === 'ERROR_SENAL' ? 'error' : 'normal';
-  $('valid-count').textContent = String(data.repeticiones);
-  $('incomplete-count').textContent = String(data.incompletos);
+  $('valid-count').textContent = mode === 'device' && !connected ? '—' : String(data.repeticiones);
+  $('incomplete-count').textContent = mode === 'device' && !connected ? '—' : String(data.incompletos);
   $('event-label').textContent = eventNames[data.ultimo_evento.codigo] ?? data.ultimo_evento.codigo.replaceAll('_', ' ');
   $('event-description').textContent = data.ultimo_evento.detalle;
-  $('calibration').textContent = `Calibración: ${calibrationNames[data.calibracion]}`;
+  $('calibration').textContent = mode === 'device' && !connected ? 'Calibración: sin confirmar' : `Calibración${mode === 'demo' ? ' simulada' : ''}: ${calibrationNames[data.calibracion]}`;
+  if (mode === 'device' && !connected) {
+    $('event-label').textContent = 'Sin resultado actual';
+    $('event-description').textContent = 'Esperando una respuesta válida del dispositivo.';
+  }
 }
 
 function setBusy(busy) {
@@ -83,12 +95,15 @@ async function pollDevice(currentRun) {
     const next = await readDevice();
     if (mode !== 'device' || currentRun !== runId) return;
     const eventChanged = next.ultimo_evento.codigo !== data.ultimo_evento.codigo || next.repeticiones !== data.repeticiones || next.incompletos !== data.incompletos;
+    connected = true;
     data = next;
     render();
     $('connection-description').textContent = 'ESP32 conectado. Las lecturas provienen del dispositivo.';
     if (eventChanged && next.ultimo_evento.codigo !== 'NINGUNO') announce(`${$('event-label').textContent}. ${next.ultimo_evento.detalle}`);
   } catch (error) {
     if (mode !== 'device' || currentRun !== runId) return;
+    connected = false;
+    render();
     $('connection-description').textContent = 'Sin conexión con /api/estado. Abre esta página desde el ESP32 o vuelve a la demostración.';
     announce('Sin conexión con el ESP32.');
   }
@@ -97,6 +112,7 @@ async function pollDevice(currentRun) {
 
 function changeMode(nextMode) {
   mode = nextMode;
+  connected = false;
   ++runId;
   clearTimeout(pollTimer);
   data = initialData();
@@ -158,6 +174,8 @@ $('reset-button').addEventListener('click', async () => {
 });
 $('calibrate-button').addEventListener('click', async () => {
   if (mode === 'demo') {
+    ++runId;
+    setBusy(false);
     data = { ...data, calibracion: 'LISTA', estado: 'REPOSO', flexion_pct: 0, contacto_pct: 0 };
     render();
     announce('Calibración simulada completada.');

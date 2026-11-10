@@ -105,7 +105,7 @@ Calibrar significa relacionar lecturas con estados conocidos de este montaje: re
 
 La memoria no volátil conservará parámetros al apagar; las variables normales en RAM no cumplen esa función. En ESP32 se puede usar Preferences/NVS \cite{nvs}, vinculando el objetivo de EEPROM del ramo con otra implementación. Todavía falta implementar y verificar esa persistencia.
 
-El monitor serie ayuda a depurar. El dashboard será la interfaz para quien use el dispositivo: debe mostrar datos enviados por el ESP32. Hoy la app muestra ejemplos simulados. Antes de integrar se debe resolver que ESPERA\_REPOSO no está admitido por su validación. Una pantalla que dice señal inválida no demuestra que el firmware detecte realmente esa condición.
+El monitor serie ayuda a depurar. El dashboard será la interfaz para quien use el dispositivo: debe mostrar datos enviados por el ESP32. Hoy la app muestra ejemplos simulados. La app ya admite ESPERA\_REPOSO y oculta porcentajes sin conexión o calibración válida. Una pantalla que dice señal inválida no demuestra que el firmware detecte realmente esa condición.
 \comprobar{Al reiniciar deben recuperarse los parámetros; al mover una entrada física, app y monitor serie deben concordar. Ambas pruebas siguen pendientes.}
 
 \section{Problema y alcance}
@@ -120,7 +120,7 @@ Bloque & Evidencia y pendiente\\\midrule
 Adquisición & Potenciómetros en Wokwi; faltan sensores físicos.\\
 Algoritmo & Cinco pruebas locales; falta evaluación física etiquetada.\\
 App & Datos simulados y contrato HTTP; falta enlace real.\\
-Integración & ESPERA\_REPOSO existe en firmware pero no en la validación de la app.\\
+Integración & ESPERA\_REPOSO ya es compatible con la app; falta probar transmisión real.\\
 Memoria y motor & Pendientes de implementación y prueba física.\\
 Soporte & Pendiente de prueba de colocación y comodidad.\\\bottomrule
 \end{longtable}
