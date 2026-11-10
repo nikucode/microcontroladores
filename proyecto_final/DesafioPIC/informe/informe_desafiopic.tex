@@ -1,0 +1,153 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{microtype}
+
+\geometry{margin=2.3cm}
+\graphicspath{{figuras/}}
+\definecolor{azul}{HTML}{354A68}
+\definecolor{lila}{HTML}{E9E4F4}
+\definecolor{verde}{HTML}{E5F2EE}
+\hypersetup{colorlinks=true,linkcolor=azul,urlcolor=azul}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Desafío PIC}
+\fancyhead[R]{\small Microcontroladores}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14pt}
+\captionsetup{font=small,labelfont=bf}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries\color{azul} Desafío PIC}\\[0.25cm]
+  {\large Lectura de temperatura y luminosidad con el PIC16F877A}\\[0.45cm]
+  {\normalsize Alex Díaz Canales y María José Córdova}\\[0.15cm]
+  {\normalsize Ingeniería en Automatización y Robótica --- Microcontroladores}\\[0.15cm]
+  {\normalsize Noviembre de 2026}
+\end{center}
+
+\noindent\colorbox{verde}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{\textbf{Estado del trabajo.}
+La simulación y el programa en C funcionan. La implementación física solicitada en la pauta todavía está pendiente.}}
+
+\section{Qué nos pidió la guía}
+
+El desafío consiste en usar un PIC16F877A con dos entradas analógicas: un sensor de temperatura LM35 y una LDR. Un interruptor debe elegir qué sensor se presenta. Cuando se elige el LM35, la pantalla debe mostrar temperatura; cuando se elige la LDR, debe mostrar intensidad luminosa en porcentaje. La entrega considera la simulación, el código en C y el archivo \texttt{.hex}, además de un montaje físico en protoboard.
+
+Elegimos dos displays de siete segmentos de cátodo común, una de las alternativas permitidas por la guía. Para la simulación usamos SimulIDE y para el firmware MPLAB X con XC8. En la versión de SimulIDE instalada, el componente disponible aparece como \texttt{p16F877}; el programa se compiló para el PIC16F877A. La diferencia entre el nombre del modelo simulado y el dispositivo solicitado debe quedar clara en la presentación.
+
+\section{Diseño del circuito}
+
+Organizamos el circuito por bloques para poder revisar cada parte por separado. La tabla resume las señales empleadas. Los números corresponden al encapsulado DIP de 40 pines del PIC16F877A, según su hoja de datos~\cite{pic}.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lclX@{}}
+\toprule
+Señal & Pin & Puerto & Función \\
+\midrule
+LM35 simulado & 3 & RA1/AN1 & Entrada de temperatura \\
+LDR & 2 & RA0/AN0 & Entrada de luminosidad \\
+Selector & 33 & RB0 & Cambia la lectura mostrada \\
+Decenas & 15 & RC0 & Habilita el primer display \\
+Unidades & 16 & RC1 & Habilita el segundo display \\
+Segmentos $a$--$g$ & 19--22, 27--29 & RD0--RD6 & Líneas compartidas entre ambos displays \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Alimentación, reset y reloj}
+
+Partimos por la alimentación de \(5\,\mathrm V\) y la referencia común de tierra. MCLR se mantiene en alto mediante una resistencia de \(10\,\mathrm{k\Omega}\); un pulsador permite llevarlo momentáneamente a tierra para reiniciar el PIC. Ajustamos la frecuencia del componente simulado a \(4\,\mathrm{MHz}\), coherente con la configuración \texttt{FOSC = XT} del programa. SimulIDE genera internamente el reloj del microcontrolador; para el montaje real tendremos que incorporar el cristal y sus condensadores, y conectar ambos VDD y ambos VSS del encapsulado~\cite{simulide,pic}.
+
+\subsection{Entradas analógicas y selector}
+
+Conectamos la LDR en un divisor \(+5\,\mathrm V \rightarrow 10\,\mathrm{k\Omega} \rightarrow \mathrm{AN0} \rightarrow \mathrm{LDR} \rightarrow \mathrm{GND}\). Cuando aumenta la luz, disminuye la resistencia de la LDR y baja la tensión de AN0. Por eso invertimos la lectura ADC al expresar el porcentaje relativo de iluminación.
+
+El catálogo de componentes de nuestra instalación no incluye un LM35. Para probar la lectura de AN1 utilizamos una fuente ajustable que representa su tensión de salida. El LM35 entrega aproximadamente \(10\,\mathrm{mV}/{}^\circ\mathrm C\); por ejemplo, \(0{,}250\,\mathrm V\) representan \(25\,{}^\circ\mathrm C\)~\cite{lm35}. Esto comprueba la adquisición y el cálculo, pero no el funcionamiento de un LM35 físico.
+
+El selector está en RB0. Una resistencia de \(10\,\mathrm{k\Omega}\) lo lleva a \(+5\,\mathrm V\) cuando el interruptor está abierto; al cerrarlo, RB0 va a tierra. En el programa, abierto significa LDR y cerrado significa temperatura.
+
+\subsection{Displays multiplexados}
+
+Conectamos RD0--RD6 a los segmentos $a$--$g$ de los dos displays. Cada línea pasa por una resistencia de \(330\,\Omega\). Para elegir qué dígito se ilumina, RC0 y RC1 conducen la base de un transistor NPN cada uno mediante \(1\,\mathrm{k\Omega}\). Los transistores conectan a tierra el cátodo común del display correspondiente. Usamos etiquetas de red en SimulIDE para evitar cruces difíciles de leer; esas etiquetas deberán traducirse a cables concretos cuando hagamos la protoboard.
+
+\section{Programa en MPLAB X}
+
+Configuramos el ADC con referencia de \(0\) a \(5\,\mathrm V\), resolución de diez bits y resultado justificado a la derecha. El programa selecciona AN0 o AN1, espera el tiempo de adquisición, inicia la conversión y combina los registros del resultado. Para el LM35 calculamos
+
+\begin{equation}
+  T\,[{}^\circ\mathrm C] \approx \frac{\mathrm{ADC}_{\mathrm{AN1}}\,500}{1023}.
+\end{equation}
+
+Para la LDR calculamos un porcentaje relativo de la escala ADC:
+
+\begin{equation}
+  L\,[\%] \approx 100 - \frac{\mathrm{ADC}_{\mathrm{AN0}}\,100}{1023}.
+\end{equation}
+
+El porcentaje no es una medición calibrada en lux: depende de la LDR, del divisor y de la iluminación usada en la prueba. Después de elegir la magnitud, el programa separa decenas y unidades, envía el patrón de segmentos al puerto D y alterna los dos displays mediante RC0 y RC1. El código completo y el \texttt{.hex} están en la carpeta \texttt{firmware/} de esta entrega.
+
+\section{Pruebas en SimulIDE}
+
+Primero verificamos que el firmware cargara y que ambos displays se encendieran. Luego ajustamos la fuente que emula el LM35. Al usar la perilla, el indicador redondeaba a dos decimales y podía mostrar \(0{,}25\,\mathrm V\) mientras los displays mostraban 24. Al escribir \(0{,}250\,\mathrm V\) en la propiedad \emph{Current Value}, obtuvimos 25. Es coherente con la resolución de un ADC de diez bits con referencia de \(5\,\mathrm V\): un paso equivale aproximadamente a \(4{,}89\,\mathrm{mV}\), o \(0{,}49\,{}^\circ\mathrm C\) para esta escala del LM35.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.70\linewidth]{temperatura_25.png}
+  \caption{Simulación en modo temperatura. La fuente que representa al LM35 indica \(0{,}25\,\mathrm V\) y los displays muestran 25. Captura de nuestra prueba.}
+\end{figure}
+
+Después abrimos el selector y movimos la perilla asociada a la LDR. Las capturas de la grabación muestran dos posiciones con lecturas diferentes, 41 y 71. Estos números son salidas del circuito simulado; no los interpretamos como valores de lux ni como una calibración de la perilla.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.70\linewidth]{luz_variacion.png}
+  \caption{Una posición de la LDR en modo luz: lectura 41. Fotograma de nuestra grabación de SimulIDE.}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.70\linewidth]{luz_variacion_2.png}
+  \caption{Otra posición de la LDR en modo luz: lectura 71. La fuente del LM35 permanece en \(0{,}25\,\mathrm V\).}
+\end{figure}
+
+\newpage
+Al guardar el circuito tuvimos que recuperar una copia anterior después de cerrar SimulIDE por accidente. Conservamos el cableado y restauramos el estado de las fuentes. Finalmente dejamos un archivo \texttt{DesafioPIC.sim1} con una ruta relativa al \texttt{.hex} y la recarga al iniciar la simulación. La captura más reciente confirma que esa copia vuelve a mostrar 25 al arrancar.
+
+\section{Qué falta y qué aprendimos}
+
+La simulación demuestra la selección de entradas, la conversión ADC y la visualización multiplexada. Todavía no demuestra el comportamiento de un LM35 real ni completa el montaje físico exigido por la pauta. Antes de llevarlo a protoboard tendremos que revisar el pinout exacto de los displays y transistores adquiridos, además de instalar la alimentación, el reloj y los condensadores de desacoplo del PIC.
+
+También encontramos un límite de presentación: dos dígitos solo permiten mostrar de 00 a 99. El firmware limita a 99 cualquier valor calculado superior, incluido el extremo de 100\,\% de luz. En la demostración debemos explicar esta decisión o cambiar el sistema de visualización si se exige representar 100 de forma literal.
+
+Este trabajo nos sirvió para separar fallas de cableado, configuración del ADC y presentación. La comparación entre el esquema de la guía, los pines del PIC y el comportamiento de SimulIDE fue importante, sobre todo al conectar los transistores y al interpretar la lectura de la fuente ajustable.
+
+\section*{Archivos entregados}
+
+\begin{itemize}
+  \item \texttt{DesafioPIC.sim1}: circuito principal de SimulIDE.
+  \item \texttt{firmware/sensores.c}: programa en C para MPLAB X y XC8.
+  \item \texttt{firmware/sensores.hex}: firmware compilado.
+  \item \texttt{informe/informe\_desafiopic.tex} y su PDF: informe y capturas de pantalla.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{pic} Microchip Technology, \emph{PIC16F87XA Data Sheet}, DS39582B. \url{https://ww1.microchip.com/downloads/en/DeviceDoc/39582b.pdf}.
+\bibitem{lm35} Texas Instruments, \emph{LM35 Precision Centigrade Temperature Sensors}, hoja de datos. \url{https://www.ti.com/lit/ds/symlink/lm35.pdf}.
+\bibitem{simulide} SimulIDE, \emph{MCUs: Basic Use and Properties}. \url{https://simulide.com/p/mcus/}.
+\bibitem{guia} Guía del \emph{Desafío PIC} entregada en la asignatura Microcontroladores, imágenes de la pauta y circuitos sugeridos proporcionadas por el docente.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,11 @@
+# Copias de recuperación locales; el circuito de entrega es DesafioPIC.sim1.
+DesafioPIC_cableado.sim1
+DesafioPIC_recuperado.sim1
+
+# Archivos auxiliares de LaTeX.
+informe/*.aux
+informe/*.log
+informe/*.out
+informe/*.toc
+informe/*.synctex.gz
+informe/missfont.log
