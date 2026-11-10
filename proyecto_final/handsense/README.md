@@ -2,11 +2,14 @@
 
 Proyecto de Alex Díaz y María José Córdova para la asignatura de Microcontroladores. La propuesta inicial fue evaluada con nota 7.
 
-HandSense es un prototipo experimental para observar ejercicios simples de mano mediante dos sensores analógicos, retroalimentación visual y háptica, y una interfaz inalámbrica. El equipo construirá un solo prototipo físico para la entrega del 25 de noviembre de 2026.
+HandSense es un prototipo experimental para observar ejercicios simples de mano mediante dos sensores analógicos, retroalimentación visual y háptica, y una interfaz inalámbrica. El equipo construirá un solo prototipo físico para la entrega de noviembre de 2026. El syllabus sitúa la evaluación en la semana del 23; el día 25 es una fecha estimada por confirmar.
 
 ## Documentos
 
-- [Ruta a la entrega del 25 de noviembre](PLAN_ENTREGA_25_NOV.md): estado actual, decisiones pendientes, tareas de Alex y Cote, fechas y pruebas para una demostración completa.
+- [Revisión de evidencia para la entrega](investigacion/2026-11-10_revision_para_entrega.md): qué está demostrado, antecedentes recientes, hipótesis de aporte y riesgos.
+- [Prompt maestro de planificación](PROMPT_MAESTRO_PLANIFICACION.md): instrucciones reutilizables para actualizar plan, informe, carta Gantt y visión futura con evidencia.
+- [Seguimiento de noviembre](SEGUIMIENTO_NOVIEMBRE.md): carta Gantt operativa y bitácora que se actualizan con cada sesión.
+- [Ruta a la entrega de noviembre](PLAN_ENTREGA_25_NOV.md): estado actual, decisiones pendientes, tareas de Alex y Cote, fechas y pruebas para una demostración completa.
 - [Plan de trabajo](PLAN_DE_TRABAJO.md): requisitos y pruebas previstos para el prototipo.
 - [Investigación de antecedentes, novedad y pivotes](investigacion/2026-10-28_antecedentes_novedad_y_pivotes.md): comparación con publicaciones, patentes y productos; propuesta de ajuste.
 - [Especificación experimental](investigacion/2026-10-28_especificacion_experimental.md): tarea elegida para investigar, hipótesis, arquitectura provisional y pruebas de decisión.

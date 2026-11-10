@@ -1,10 +1,10 @@
-# HandSense — ruta a la entrega del 25 de noviembre de 2026
+# HandSense — ruta a la entrega de noviembre de 2026
 
 **Equipo:** Alex Díaz y María José Córdova (Cote).
 
 **Meta:** un solo prototipo físico demostrable. Las simulaciones y pruebas de mesa son etapas de ese prototipo, no versiones adicionales para comprar o fabricar.
 
-**Fecha:** 10 de noviembre de 2026. Este calendario es una propuesta de trabajo; la disponibilidad de piezas aún debe confirmarse.
+**Fecha:** 10 de noviembre de 2026. El syllabus local sitúa la entrega y presentación del proyecto (30 %) en la **semana del 23 de noviembre**; Alex tiene el **25 de noviembre** como fecha estimada. Hasta confirmar el aviso del curso, el prototipo debe estar listo el **23**. La disponibilidad de piezas aún debe confirmarse.
 
 ## Qué debe mostrar la demostración
 
@@ -49,9 +49,9 @@ La división permite avanzar en simultáneo. Ambos deben conocer el circuito y l
 | **13 nov.** | Placa, motor, alimentación y forma de comunicación definidos; compra/préstamo resuelto | Mantener ESP32 DevKit como opción de montaje si el XIAO no llega |
 | **18 nov.** | Dashboard recibe lecturas y eventos del ESP32; acciones y almacenamiento probados primero con entradas simuladas | Priorizar estado en vivo y recuperación de calibración; documentar cualquier acción de la app que falte |
 | **21 nov.** | Ambos sensores y motor probados por separado en mesa; rangos ADC, polaridad y consumo registrados | Corregir circuito y umbrales con medidas, sin copiar los límites de Wokwi |
-| **23 nov.** | Sistema integrado en soporte; prueba completa y prueba incompleta; reinicio y reconexión verificados | Usar montaje de mesa ordenado como respaldo de demostración y explicar la limitación del soporte |
-| **24 nov.** | Video corto de demostración, fotos del circuito, resultados, código y presentación cerrados | Reservar el día para corregir fallas y ensayar, no para añadir funciones |
-| **25 nov.** | Entrega y demostración | Llevar respaldo de firmware, documentación y evidencia de pruebas |
+| **22 nov.** | Sistema integrado en soporte; prueba completa y prueba incompleta; reinicio y reconexión verificados. Video, fotos, resultados y presentación cerrados | Usar montaje de mesa ordenado como respaldo de demostración y explicar la limitación del soporte |
+| **23 nov.** | Equipo listo para entrega y demostración; el syllabus inicia esta semana con la evaluación | Llevar respaldo de firmware, documentación y evidencia de pruebas |
+| **25 nov.** | Fecha estimada mencionada por Alex, pendiente de confirmar con el curso | Si se confirma, usar el tiempo extra para ensayo y correcciones, no para ampliar alcance |
 
 ## Registro mínimo para defender el prototipo
 
