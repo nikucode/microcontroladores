@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'data/attempt.dart';
 import 'ui/session_model.dart';
+import 'ui/screens.dart';
 
 void main() => runApp(const HandSenseApp());
 
@@ -13,6 +14,9 @@ class HandSenseApp extends StatefulWidget {
 
 class _HandSenseAppState extends State<HandSenseApp> {
   final model = SessionModel(DemoRepository());
+  int page = 0;
+  bool largeText = false;
+  bool highContrast = false;
   @override
   void dispose() {
     model.dispose();
@@ -24,89 +28,100 @@ class _HandSenseAppState extends State<HandSenseApp> {
     title: 'HandSense',
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff31775f)),
       useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xff245c4b),
+        contrastLevel: highContrast ? 1 : 0,
+      ),
+      scaffoldBackgroundColor: highContrast
+          ? Colors.white
+          : const Color(0xfff6f5ef),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(minimumSize: const Size(48, 52)),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(minimumSize: const Size(48, 52)),
+      ),
     ),
-    home: Scaffold(
-      appBar: AppBar(title: const Text('HandSense')),
-      body: SafeArea(
-        child: ListenableBuilder(
-          listenable: model,
-          builder: (context, _) => ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              Text(
-                'Por qué se contó',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
-              const SizedBox(height: 12),
-              const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'DEMOSTRACIÓN · Datos simulados\nExplora ejemplos de intentos. BLE y almacenamiento persistente todavía no están implementados.',
+    builder: (context, child) {
+      final media = MediaQuery.of(context);
+      return MediaQuery(
+        data: media.copyWith(
+          textScaler: largeText
+              ? TextScaler.linear(media.textScaler.scale(1) * 1.25)
+              : media.textScaler,
+        ),
+        child: child!,
+      );
+    },
+    home: Builder(
+      builder: (context) => Scaffold(
+        appBar: AppBar(title: const Text('HandSense')),
+        body: SafeArea(
+          child: ListenableBuilder(
+            listenable: model,
+            builder: (context, _) => Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: switch (page) {
+                  0 => HomeScreen(onExercise: () => setState(() => page = 1)),
+                  1 => ExerciseScreen(
+                    model: model,
+                    onFinished: () {
+                      model.finish();
+                      setState(() => page = 2);
+                    },
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Completas: ${model.complete} · Incompletas: ${model.incomplete}\nNo evaluables: ${model.unreliable}',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Text(
-                'Conteo por flexión: ${model.flexOnly} · Por fusión: ${model.complete}',
-              ),
-              const Text(
-                'Comparación ilustrativa. No son mediciones físicas ni una prueba de precisión.',
-              ),
-              const SizedBox(height: 20),
-              for (final outcome in Outcome.values)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: OutlinedButton(
-                    onPressed: () => model.simulate(outcome),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text('Simular: ${Attempt(0, outcome).title}'),
-                    ),
+                  2 => HistoryScreen(model: model),
+                  _ => SettingsScreen(
+                    largeText: largeText,
+                    highContrast: highContrast,
+                    onLargeText: (value) => setState(() => largeText = value),
+                    onHighContrast: (value) =>
+                        setState(() => highContrast = value),
                   ),
-                ),
-              if (model.attempts.isNotEmpty)
-                Semantics(
-                  liveRegion: true,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      'Último resultado: ${model.attempts.last.title}',
-                    ),
-                  ),
-                ),
-              const Divider(),
-              Text(
-                'Intentos de esta demostración',
-                style: Theme.of(context).textTheme.titleLarge,
+                },
               ),
-              const Text(
-                'Se pierden al cerrar la aplicación. Cada intento explica las señales del ejemplo, no tu capacidad.',
-              ),
-              for (final attempt in model.attempts.reversed)
-                Card(
-                  child: ExpansionTile(
-                    key: ValueKey(attempt),
-                    title: Text('Intento ${attempt.id}: ${attempt.title}'),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(attempt.explanation),
+            ),
+          ),
+        ),
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: Material(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Wrap(
+                alignment: WrapAlignment.spaceEvenly,
+                children: [
+                  for (int i = 0; i < 4; i++)
+                    Semantics(
+                      selected: page == i,
+                      child: TextButton.icon(
+                        key: ValueKey('nav-$i'),
+                        style: TextButton.styleFrom(
+                          minimumSize: const Size(48, 48),
+                          backgroundColor: page == i
+                              ? Theme.of(context).colorScheme.secondaryContainer
+                              : null,
+                        ),
+                        onPressed: () => setState(() => page = i),
+                        icon: Icon(
+                          [
+                            Icons.home_outlined,
+                            Icons.touch_app_outlined,
+                            Icons.history,
+                            Icons.settings_outlined,
+                          ][i],
+                        ),
+                        label: Text(
+                          ['Inicio', 'Ejercicio', 'Historial', 'Ajustes'][i],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-              TextButton(
-                onPressed: model.attempts.isEmpty ? null : model.reset,
-                child: const Text('Borrar demostración'),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

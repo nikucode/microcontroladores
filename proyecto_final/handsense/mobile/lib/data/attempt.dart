@@ -1,3 +1,5 @@
+import 'dart:async';
+
 enum Outcome { complete, noContact, noFlexion, noRelease, unreliable }
 
 class Attempt {
@@ -24,20 +26,48 @@ class Attempt {
   };
 }
 
-abstract class AttemptRepository {
-  List<Attempt> get attempts;
-  void simulate(Outcome outcome);
-  void clear();
+// Una fuente BLE futura publicará eventos verificados en este mismo flujo.
+abstract class AttemptSource {
+  Stream<Attempt> get events;
+  String get label;
+  bool get isDemo;
+  void dispose();
 }
 
-// Ejemplos de resultados; no ejecuta ni valida el clasificador del ESP32.
-class DemoRepository implements AttemptRepository {
-  final List<Attempt> _attempts = [];
+abstract class DemoControls {
+  void simulate(Outcome outcome);
+}
+
+class DemoRepository implements AttemptSource, DemoControls {
+  final _events = StreamController<Attempt>.broadcast(sync: true);
+  int _nextId = 0;
   @override
-  List<Attempt> get attempts => List.unmodifiable(_attempts);
+  Stream<Attempt> get events => _events.stream;
   @override
-  void simulate(Outcome outcome) =>
-      _attempts.add(Attempt(_attempts.length + 1, outcome));
+  String get label => 'Demostración';
   @override
-  void clear() => _attempts.clear();
+  bool get isDemo => true;
+  @override
+  void simulate(Outcome outcome) => _events.add(Attempt(++_nextId, outcome));
+  @override
+  void dispose() => _events.close();
+}
+
+class SessionRecord {
+  SessionRecord(
+    this.id,
+    this.finishedAt,
+    this.source,
+    this.isDemo,
+    List<Attempt> attempts,
+  ) : attempts = List.unmodifiable(attempts);
+  final int id;
+  final DateTime finishedAt;
+  final String source;
+  final bool isDemo;
+  final List<Attempt> attempts;
+  int get complete => attempts.where((a) => a.complete).length;
+  int get incomplete =>
+      attempts.where((a) => a.evaluable && !a.complete).length;
+  int get unreliable => attempts.where((a) => !a.evaluable).length;
 }
