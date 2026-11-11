@@ -65,3 +65,7 @@ Alex confirma compra de ESP32 y sensores por AliExpress y próxima visita a San 
 ## Entrada 06 — Integridad de la interfaz, 10 de noviembre de 2026
 
 Se resolvió en la app la incompatibilidad ESPERA_REPOSO. Se incorporaron presentación condicionada a conexión/calibración, mensajes accesibles y explicación desplegable. Las decisiones y fuentes están en app/DECISIONES.md. H4 avanza en contrato y presentación, pero el servidor ESP32, calibración física y persistencia continúan pendientes.
+
+## Entrada 07 — Primera app Flutter, 10 de noviembre de 2026
+
+Android SDK preparado por Alex. Se creó mobile/ para Android con modelo, repositorio de demostración, presentación y pruebas. Distingue completos, incompletos y no evaluables, con explicaciones y conteo ilustrativo. BLE e historial persistente pendientes. Análisis estático aprobado; ejecución de pruebas y build bloqueados por sockets/red en Codex, pendientes en la terminal del usuario. La web se conserva como referencia; la ruta móvil requiere comprobar APK en teléfono antes de cerrar el cambio de transporte a BLE.
