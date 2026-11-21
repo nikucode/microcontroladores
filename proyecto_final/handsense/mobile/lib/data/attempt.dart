@@ -34,6 +34,36 @@ abstract class AttemptSource {
   void dispose();
 }
 
+enum DeviceConnectionPhase {
+  idle,
+  requestingPermission,
+  scanning,
+  connecting,
+  connected,
+  disconnected,
+  error,
+}
+
+class HandSenseConnectionState {
+  const HandSenseConnectionState(this.phase, this.message, {this.deviceName});
+
+  final DeviceConnectionPhase phase;
+  final String message;
+  final String? deviceName;
+
+  bool get connected => phase == DeviceConnectionPhase.connected;
+}
+
+/// Capacidades exclusivas de una fuente física. La demostración no implementa
+/// esta interfaz, por lo que sus datos nunca se confunden con mediciones BLE.
+abstract class DeviceControls {
+  Stream<HandSenseConnectionState> get connectionStates;
+  HandSenseConnectionState get connectionState;
+  Future<void> connect();
+  Future<void> disconnect();
+  Future<bool> ping();
+}
+
 abstract class DemoControls {
   void simulate(Outcome outcome);
 }

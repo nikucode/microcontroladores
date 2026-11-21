@@ -1,6 +1,53 @@
-# Contrato inicial entre ESP32 y app
+# Contrato entre ESP32 y app
 
-**Estado:** propuesta de integración, pendiente de implementar y verificar en hardware. El firmware calcula estados y eventos; la app solo los muestra. Todos los porcentajes son relativos a la calibración de cada montaje, no unidades clínicas.
+## Transporte vigente: BLE GATT v1 — 18 de noviembre de 2026
+
+Esta sección reemplaza al transporte HTTP como camino principal. Su
+implementación Flutter está preparada, pero aún no se ha probado con el ESP32
+físico. Los UUID son parte del contrato y deben copiarse exactamente al
+firmware:
+
+| Elemento | UUID | Operación |
+|---|---|---|
+| Servicio HandSense | `6c7a0001-8e2d-4f91-a6b5-3d3f7a120001` | Anunciar y descubrir |
+| Eventos | `6c7a0002-8e2d-4f91-a6b5-3d3f7a120001` | ESP32 notifica; teléfono se suscribe |
+| Control | `6c7a0003-8e2d-4f91-a6b5-3d3f7a120001` | Teléfono escribe con respuesta |
+
+Nombre anunciado esperado: `HandSense` o un nombre que comience por
+`HandSense`.
+
+Los mensajes son UTF-8 compactos, sin salto de línea, y no superan 20 bytes:
+
+```text
+HS1,E,<secuencia>,C     completa
+HS1,E,<secuencia>,NC    sin contacto
+HS1,E,<secuencia>,NF    sin flexión
+HS1,E,<secuencia>,NR    sin liberación
+HS1,E,<secuencia>,U     no evaluable
+```
+
+`secuencia` es un entero no negativo que permite descartar notificaciones
+repetidas dentro de una conexión. `U` solo debe emitirse cuando el firmware
+realmente detecte una señal no evaluable; no es sinónimo de movimiento
+incompleto.
+
+La primera orden bidireccional es:
+
+```text
+Teléfono → Control: HS1,C,PING
+ESP32 → Eventos:    HS1,A,PING,OK
+```
+
+La app solo informa que el ESP32 confirmó la orden si recibe el `ACK` en menos
+de tres segundos. Que Android acepte la escritura GATT no se considera una
+confirmación del firmware.
+
+## Contrato HTTP histórico
+
+**Estado:** propuesta anterior conservada como antecedente; ya no es el camino
+principal. El firmware calcula estados y eventos; la app solo los muestra.
+Todos los porcentajes son relativos a la calibración de cada montaje, no
+unidades clínicas.
 
 ## Leer estado
 

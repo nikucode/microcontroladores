@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'data/attempt.dart';
+import 'data/ble_attempt_source.dart';
 import 'ui/session_model.dart';
 import 'ui/screens.dart';
 
@@ -21,6 +22,32 @@ class _HandSenseAppState extends State<HandSenseApp> {
   void dispose() {
     model.dispose();
     super.dispose();
+  }
+
+  Future<void> _useDevice(BuildContext context) async {
+    await model.replaceSource(BleAttemptSource());
+    await model.connect();
+    if (!context.mounted) return;
+    if (model.connectionState.phase == DeviceConnectionPhase.error) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(model.connectionState.message)));
+    }
+  }
+
+  Future<void> _useDemo() => model.replaceSource(DemoRepository());
+
+  Future<void> _ping(BuildContext context) async {
+    final acknowledged = await model.ping();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          acknowledged
+              ? 'El ESP32 confirmó PING.'
+              : 'No llegó la confirmación del ESP32 en 3 segundos.',
+        ),
+      ),
+    );
   }
 
   @override
@@ -64,7 +91,13 @@ class _HandSenseAppState extends State<HandSenseApp> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 760),
                 child: switch (page) {
-                  0 => HomeScreen(onExercise: () => setState(() => page = 1)),
+                  0 => HomeScreen(
+                    model: model,
+                    onExercise: () => setState(() => page = 1),
+                    onUseDevice: () => _useDevice(context),
+                    onUseDemo: _useDemo,
+                    onPing: () => _ping(context),
+                  ),
                   1 => ExerciseScreen(
                     model: model,
                     onFinished: () {
@@ -74,6 +107,7 @@ class _HandSenseAppState extends State<HandSenseApp> {
                   ),
                   2 => HistoryScreen(model: model),
                   _ => SettingsScreen(
+                    model: model,
                     largeText: largeText,
                     highContrast: highContrast,
                     onLargeText: (value) => setState(() => largeText = value),

@@ -27,13 +27,34 @@ class Panel extends StatelessWidget {
 
 Widget heading(BuildContext context, String text) =>
     Text(text, style: Theme.of(context).textTheme.headlineMedium);
-const demoNotice = Text(
-  'Demostración · Datos simulados. Sin conexión con sensores físicos.',
-);
+
+class SourceNotice extends StatelessWidget {
+  const SourceNotice({super.key, required this.model});
+  final SessionModel model;
+  @override
+  Widget build(BuildContext context) => Text(
+    model.isDemo
+        ? 'Demostración · Datos simulados. Sin conexión con sensores físicos.'
+        : model.isConnected
+        ? 'Dispositivo real · Los eventos provienen del ESP32 conectado.'
+        : 'Dispositivo real seleccionado · Aún no hay conexión ni mediciones.',
+  );
+}
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, required this.onExercise});
+  const HomeScreen({
+    super.key,
+    required this.model,
+    required this.onExercise,
+    required this.onUseDevice,
+    required this.onUseDemo,
+    required this.onPing,
+  });
+  final SessionModel model;
   final VoidCallback onExercise;
+  final VoidCallback onUseDevice;
+  final VoidCallback onUseDemo;
+  final VoidCallback onPing;
   @override
   Widget build(BuildContext context) => PageContent(
     children: [
@@ -41,21 +62,56 @@ class HomeScreen extends StatelessWidget {
       const Text(
         'HandSense observa flexión y contacto para explicar cómo se completa una pinza entre pulgar e índice.',
       ),
-      const Panel(
+      Panel(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
-              Icons.bluetooth_disabled,
-              semanticLabel: 'Dispositivo sin conectar',
+              model.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
+              semanticLabel: model.isConnected
+                  ? 'Dispositivo conectado'
+                  : 'Dispositivo sin conectar',
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Dispositivo: sin conectar',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              model.isDemo
+                  ? 'Origen: demostración'
+                  : 'Dispositivo: ${model.connectionState.deviceName ?? 'HandSense'}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            Text(
-              'La conexión BLE estará disponible en una próxima etapa. Hoy puedes explorar ejemplos.',
+            Text(model.connectionState.message),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (model.isDemo)
+                  FilledButton.icon(
+                    key: const ValueKey('connect-device'),
+                    onPressed: onUseDevice,
+                    icon: const Icon(Icons.bluetooth_searching),
+                    label: const Text('Buscar HandSense'),
+                  )
+                else ...[
+                  OutlinedButton(
+                    key: const ValueKey('use-demo'),
+                    onPressed: onUseDemo,
+                    child: const Text('Volver a demostración'),
+                  ),
+                  if (model.isConnected)
+                    FilledButton(
+                      key: const ValueKey('ping-device'),
+                      onPressed: onPing,
+                      child: const Text('Comprobar conexión'),
+                    )
+                  else
+                    FilledButton(
+                      key: const ValueKey('retry-device'),
+                      onPressed: onUseDevice,
+                      child: const Text('Buscar otra vez'),
+                    ),
+                ],
+              ],
             ),
           ],
         ),
@@ -81,7 +137,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      demoNotice,
+      SourceNotice(model: model),
     ],
   );
 }
@@ -150,7 +206,7 @@ class ExerciseScreen extends StatelessWidget {
   Widget build(BuildContext context) => PageContent(
     children: [
       heading(context, 'La pinza, paso a paso'),
-      demoNotice,
+      SourceNotice(model: model),
       const Panel(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,8 +300,10 @@ class HistoryScreen extends StatelessWidget {
           children: [
             heading(context, 'Tus sesiones'),
             const SizedBox(height: 12),
-            const Text(
-              'Historial temporal de demostración. Se pierde al cerrar la app.',
+            Text(
+              model.isDemo
+                  ? 'Historial temporal de demostración. Se pierde al cerrar la app.'
+                  : 'Historial temporal de eventos BLE reales. Se pierde al cerrar la app.',
             ),
             const SizedBox(height: 12),
             if (model.attempts.isNotEmpty)
@@ -307,11 +365,13 @@ class HistoryScreen extends StatelessWidget {
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({
     super.key,
+    required this.model,
     required this.largeText,
     required this.highContrast,
     required this.onLargeText,
     required this.onHighContrast,
   });
+  final SessionModel model;
   final bool largeText, highContrast;
   final ValueChanged<bool> onLargeText, onHighContrast;
   @override
@@ -331,12 +391,16 @@ class SettingsScreen extends StatelessWidget {
         value: highContrast,
         onChanged: onHighContrast,
       ),
-      const Panel(
+      Panel(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Dispositivo', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('Sin conexión BLE. No hay mediciones físicas disponibles.'),
+            const Text(
+              'Dispositivo',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(model.connectionState.message),
+            Text('Fuente activa: ${model.sourceLabel}'),
           ],
         ),
       ),

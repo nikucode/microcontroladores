@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.LibraryExtension
+
 allprojects {
     repositories {
         google()
@@ -17,6 +19,19 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+// reactive_ble_mobile 5.5.0 declara compileSdk 33, pero sus dependencias
+// AndroidX actuales requieren 34 o superior. La aplicación ya se compila con
+// SDK 36; igualamos únicamente este módulo sin modificar el caché de Pub.
+subprojects {
+    if (name == "reactive_ble_mobile") {
+        afterEvaluate {
+            extensions.configure<LibraryExtension> {
+                compileSdk = 36
+            }
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

@@ -5,6 +5,16 @@ import 'package:handsense/data/attempt.dart';
 import 'package:handsense/ui/session_model.dart';
 
 Future<void> tapVisible(WidgetTester tester, Finder target) async {
+  // ListView builds off-screen children lazily. Scroll to create the target
+  // before ensureVisible tries to access its Element.
+  if (target.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      target,
+      200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 50,
+    );
+  }
   await tester.ensureVisible(target);
   await tester.pumpAndSettle();
   await tester.tap(target);
@@ -47,6 +57,12 @@ void main() {
     await tapVisible(tester, find.byKey(const ValueKey('start-demo')));
     await tapVisible(tester, find.byKey(const ValueKey('demo-controls')));
     await tapVisible(tester, find.byKey(const ValueKey('scenario-complete')));
+    await tester.scrollUntilVisible(
+      find.text('Completas: 1'),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+      maxScrolls: 50,
+    );
     expect(find.text('Completas: 1'), findsOneWidget);
     await tapVisible(tester, find.byKey(const ValueKey('finish-session')));
     expect(find.text('Tus sesiones'), findsOneWidget);

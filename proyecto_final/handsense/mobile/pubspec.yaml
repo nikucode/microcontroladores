@@ -34,6 +34,11 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  # 5.6/13.x exigen Android SDK 37, que la herramienta local instala como
+  # android-37.0 y el Gradle actual no reconoce. Estas versiones conservan la
+  # API usada por HandSense y son compatibles con el SDK 35/36 instalado.
+  flutter_reactive_ble: 5.5.0
+  permission_handler: 12.0.3
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +50,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+
+# flutter_reactive_ble 5.5.0 permite versiones transitivas 5.x y Pub estaba
+# eligiendo reactive_ble_mobile 5.6.0, que vuelve a exigir SDK 37. Se fijan los
+# módulos de la misma familia para mantener una versión coherente.
+dependency_overrides:
+  reactive_ble_mobile: 5.5.0
+  reactive_ble_platform_interface: 5.5.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

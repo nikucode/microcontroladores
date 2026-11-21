@@ -8,12 +8,12 @@ Este protocolo se fija antes de medir hardware. Los criterios son objetivos de i
 | Conteo | Cinco pruebas C++ | Secuencias observadas manualmente y comparación en las mismas señales | Parcial |
 | LED y motor | LED simulado | Activación física, corriente y ausencia de reinicios; percepción del pulso | Pendiente |
 | Memoria | Propuesta | Guardar calibración válida, apagar y recuperar mismos parámetros | Pendiente |
-| Wi-Fi/app | Demo y contrato | Datos reales, reconexión y acciones verificadas | Pendiente |
+| BLE/app | App Android, contrato GATT v1 y parser | Descubrimiento, evento real, reconexión y `PING` con ACK verificados | Parcial; falta ESP32 físico |
 | Soporte | Propuesta | Tiempo de colocación, interferencia con pinza y recolocación registrados | Pendiente |
 
 ## Brechas del código que condicionan la integración
 
-- Actualizado: la app admite ESPERA_REPOSO del firmware y lo explica. La compatibilidad está probada localmente; falta verificar transporte HTTP físico.
+- Actualizado: la app conserva la demostración y prepara una fuente BLE separada. El parser distingue los cinco eventos y descarta secuencias repetidas; falta descargar dependencias, compilar el APK actualizado y verificar GATT con el ESP32 físico.
 - ERROR_SENAL y calibración inválida son escenarios de la app; el detector no implementa ese bloqueo todavía.
 - La regla actual recuerda haber visto flexión y contacto. Debe documentarse qué orden/solapamiento se acepta y probar contacto primero, flexión primero y entradas simultáneas.
 - Los 3 segundos y umbrales del sketch son provisionales. No utilizarlos como tiempo terapéutico ni umbral universal.
@@ -33,7 +33,7 @@ Usar ensayos nuevos después de fijar parámetros. Como piloto de ingeniería, i
 
 Ejecutar detector por flexión y por fusión sobre las mismas señales. Etiqueta manual independiente: ¿hubo flexión, contacto y retorno observados? Registrar desacuerdos; no usar el propio algoritmo como verdad de referencia. Informar TP, FP, FN, TN con denominadores, tasa de abstención y fallos por clase. No ajustar parámetros usando la evaluación; si se ajustan, repetir con datos nuevos.
 
-Comprobar motor activado mientras se adquiere ADC, reinicio, pérdida/reconexión Wi-Fi, órdenes de reinicio de sesión y datos inválidos. Registrar por separado integración y calidad del conteo.
+Comprobar motor activado mientras se adquiere ADC, reinicio, pérdida/reconexión BLE, `PING` con ACK y datos inválidos. Registrar por separado integración y calidad del conteo.
 
 ## Formato de datos
 

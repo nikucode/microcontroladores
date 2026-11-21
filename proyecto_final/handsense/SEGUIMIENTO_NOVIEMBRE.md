@@ -69,3 +69,29 @@ Se resolvió en la app la incompatibilidad ESPERA_REPOSO. Se incorporaron presen
 ## Entrada 07 — Primera app Flutter, 10 de noviembre de 2026
 
 Android SDK preparado por Alex. Se creó mobile/ para Android con modelo, repositorio de demostración, presentación y pruebas. Distingue completos, incompletos y no evaluables, con explicaciones y conteo ilustrativo. BLE e historial persistente pendientes. Análisis estático aprobado; ejecución de pruebas y build bloqueados por sockets/red en Codex, pendientes en la terminal del usuario. La web se conserva como referencia; la ruta móvil requiere comprobar APK en teléfono antes de cerrar el cambio de transporte a BLE.
+
+## Entrada 08 — Base de integración BLE, 18 de noviembre de 2026
+
+Alex confirmó en su terminal las cuatro pruebas Flutter de la experiencia móvil.
+Se auditó el repositorio: la app y la máquina de estados existen localmente; el
+paquete `HandSense_BLE_diagnostico.zip` mencionado en el traspaso no está en la
+máquina y la placa física todavía no está confirmada, por lo que no se cambiaron
+los GPIO de Wokwi.
+
+Se definió el contrato GATT v1 y se implementó una fuente Flutter BLE separada
+de la demostración: permisos Android, búsqueda por servicio, conexión,
+notificaciones, deduplicación de eventos y orden `PING` con ACK. Se agregaron
+pruebas del parser y se mantuvieron las cinco pruebas históricas de lógica, que
+volvieron a aprobar. También se creó `firmware/ble_diagnostico/sketch.ino`,
+separado del detector y sin GPIO, para validar anuncio y `PING` antes de integrar
+sensores. No hay Arduino CLI/core ESP32 instalado en este entorno, así que ese
+sketch no fue compilado. La descarga de dependencias y la suite Flutter completa
+no pudieron ejecutarse en Codex por restricciones de red/socket; no se declara
+BLE funcional hasta compilar en la terminal de Alex y probar con el ESP32.
+
+**Hitos:** H3 conserva evidencia simulada; H4 avanza de contrato a integración
+Flutter, pero sigue parcial hasta implementar el servicio en la placa y recibir
+un evento real. **Siguiente paso de Alex:** confirmar el modelo exacto de ESP32,
+ejecutar las verificaciones Flutter y probar el anuncio/ACK primero con nRF
+Connect. **Siguiente paso de Cote:** registrar inventario recibido y modelos
+exactos de sensor, motor y etapa de control.
