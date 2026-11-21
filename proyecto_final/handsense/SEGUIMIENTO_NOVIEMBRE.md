@@ -1,3 +1,5 @@
+> **ARCHIVO HISTÓRICO — NO ES LA ESPECIFICACIÓN ACTUAL (corte 10/11/2026).** Este documento se conserva para explicar la evolución del proyecto. Consulta [README](README.md) o [LEER_PRIMERO](LEER_PRIMERO.md) y `documentacion_actual/` antes de aplicar fechas, pinout, app o protocolo. **Feria oficial: 27/11/2026. Diseño actual: XIAO ESP32-C3 + BLE + Flutter.**
+
 # HandSense — seguimiento, carta Gantt corta y bitácora de noviembre
 
 **Corte:** 10 de noviembre de 2026. **Fecha interna de sistema listo:** 23 de noviembre; el día exacto de presentación debe cotejarse con el aviso vigente del curso. Esta tabla amplía, sin reemplazar, la carta Gantt de septiembre en `/home/minimodecoro/Downloads/Carta_Gantt_HandSense.ods`.

@@ -1,3 +1,5 @@
+> **HISTÓRICO (10/11/2026): contrato HTTP/Wi-Fi de la app web, NO protocolo BLE del Flutter actual.** Ver [estado técnico](../documentacion_actual/ESTADO_TECNICO_Y_BLE.md) y [reproducción](../documentacion_actual/REPRODUCIBILIDAD.md). No implementar estos endpoints como sustituto de la interfaz BLE.
+
 # Contrato inicial entre ESP32 y app
 
 **Estado:** propuesta de integración, pendiente de implementar y verificar en hardware. El firmware calcula estados y eventos; la app solo los muestra. Todos los porcentajes son relativos a la calibración de cada montaje, no unidades clínicas.
