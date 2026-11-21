@@ -425,7 +425,7 @@ class SettingsScreen extends StatelessWidget {
         child: const Text('Acerca de la calibración'),
       ),
       const Text(
-        'HandSense · Alex Díaz y María José Córdova\nPrototipo académico experimental. Sin validación clínica.',
+        'HandSense · Alex Díaz y María José Córdoba\nPrototipo académico experimental. Sin validación clínica.',
       ),
     ],
   );

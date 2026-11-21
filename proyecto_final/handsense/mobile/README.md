@@ -1,6 +1,6 @@
 # HandSense móvil — experiencia Android y base BLE 0.3
 
-Cuatro destinos: Inicio, Ejercicio, Historial y Ajustes. La versión anterior fue compilada e instalada por Alex; esta actualización requiere nueva compilación y verificación en el teléfono.
+Cuatro destinos: Inicio, Ejercicio, Historial y Ajustes. Alex compiló el APK BLE actualizado; falta instalarlo y verificar BLE con el teléfono y ESP32 físicos.
 
 ## Uso
 
@@ -11,7 +11,7 @@ Cuatro destinos: Inicio, Ejercicio, Historial y Ajustes. La versión anterior fu
 5. «Finalizar y ver sesión» conserva una instantánea en Historial y vacía la sesión activa. Entrar a una sesión muestra todos sus intentos y explicaciones.
 6. Ajustes permite ampliar texto sobre la escala de Android y aumentar contraste. Calibración informa que aún está pendiente.
 
-Sesiones y ajustes viven **solo en memoria**; se pierden cuando el proceso termina. La fuente BLE está implementada, pero no equivale a una conexión comprobada: todavía falta compilar esta actualización y probarla con el ESP32 físico. No hay calibración ni almacenamiento persistente.
+Sesiones y ajustes viven **solo en memoria**; se pierden cuando el proceso termina. La fuente BLE está implementada, pero no equivale a una conexión comprobada. No hay calibración ni almacenamiento persistente.
 
 ## Arquitectura
 
@@ -48,10 +48,10 @@ Las cuatro pruebas cubren los cinco escenarios, categorías y conteos, archivo i
 
 Estado de la integración BLE 0.3:
 
-- Las 5 pruebas C++ históricas del detector aprobaron nuevamente.
+- Las 9 pruebas C++ del detector aprobaron; cuatro casos nuevos cubren orden inverso, simultaneidad, liberación invertida y recuperación.
 - `dart analyze` aprobó modelos, parser y pruebas del protocolo.
-- Alex descargó inicialmente las versiones más recientes y las 7 pruebas aprobaron, pero Android SDK 37 quedó instalado como `android-37.0` y Gradle no pudo resolver el objetivo `android-37`. Se fijaron `flutter_reactive_ble 5.5.0` y `permission_handler 12.0.3`, compatibles con el SDK 35/36 existente; falta repetir la compilación.
-- Por lo anterior, análisis completo, suite Flutter, APK y prueba BLE quedan pendientes en la terminal de Alex.
+- El primer intento con dependencias recientes exigió Android SDK 37. Se fijaron `flutter_reactive_ble 5.5.0`, `permission_handler 12.0.3` y módulos BLE transitivos 5.5.0; Alex repitió la suite y compiló el APK con SDK 36.
+- Alex repitió `flutter analyze`, `flutter test` y `flutter build apk --debug`: análisis limpio, **7 pruebas aprobadas** y APK generado. La instalación falló únicamente porque ADB no detectó un teléfono; BLE físico sigue pendiente.
 
 Contrato mínimo del ESP32: anunciar el servicio y características definidos en `lib/data/handsense_protocol.dart`, notificar `HS1,E,<secuencia>,<código>` y responder `HS1,A,PING,OK` al recibir `HS1,C,PING`.
 
@@ -71,7 +71,7 @@ existe todavía y luego lo pulsa. También vuelve hacia los contadores antes de
 comprobarlos. Se conservan todas las aserciones y los tamaños de prueba; no se
 modificó el código de la aplicación para ocultar el fallo.
 
-Después de la corrección, `flutter analyze --no-pub` pasó. El intento de
-`flutter test --no-pub` en Codex sigue bloqueado al abrir el socket local antes de
-cargar las pruebas. Por tanto, falta confirmar esta corrección desde la terminal
-de Alex; no se declara que la suite ya pase.
+Después de la corrección, Alex confirmó desde su terminal que las pruebas pasan.
+En el entorno restringido de Codex, `flutter test --no-pub` sigue sin poder abrir
+el socket local; este bloqueo del entorno no reemplaza ni invalida el resultado
+registrado por Alex.
