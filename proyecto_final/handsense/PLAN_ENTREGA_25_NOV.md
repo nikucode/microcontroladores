@@ -1,3 +1,5 @@
+> **ARCHIVO HISTÓRICO — NO ES LA ESPECIFICACIÓN ACTUAL (corte 10/11/2026).** Este documento se conserva para explicar la evolución del proyecto. Consulta [README](README.md) o [LEER_PRIMERO](LEER_PRIMERO.md) y `documentacion_actual/` antes de aplicar fechas, pinout, app o protocolo. **Feria oficial: 27/11/2026. Diseño actual: XIAO ESP32-C3 + BLE + Flutter.**
+
 # HandSense — ruta a la entrega de noviembre de 2026
 
 **Equipo:** Alex Díaz y María José Córdova (Cote).

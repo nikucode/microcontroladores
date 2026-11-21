@@ -1,3 +1,5 @@
+> **HISTÓRICO (10/11/2026).** Las instrucciones de pérdida/reconexión Wi-Fi pertenecen a la arquitectura antigua: el diseño actual requiere **BLE GATT** y comprobación de comando desde Flutter. Conservar ensayos ADC y criterios metodológicos; revisar [rubro vigente](../documentacion_actual/RUBRICA_Y_AFICHE.md) antes de entregar.
+
 # Protocolo y matriz de cierre — 10 de noviembre de 2026
 
 Este protocolo se fija antes de medir hardware. Los criterios son objetivos de ingeniería propuestos; no equivalen a certificación clínica.
