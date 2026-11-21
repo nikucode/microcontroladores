@@ -33,6 +33,8 @@ Vfsr  = 3,3 × 10.000/(Rfsr + 10.000)
 ```
 Son tensiones **ideales calculadas**, no medidas. Usar el ADC ESP32-C3 con atenuación/calibración apropiadas; comparar mV contra multímetro.
 
+La documentación oficial confirma D1/GPIO3 y D2/GPIO4 como canales ADC1. Con Arduino-ESP32, 11 dB publica un rango medible aproximado de 150–3100 mV, no 0–3300 mV lineales. El divisor FSR ideal se acerca a 3,3 V cuando su resistencia cae, por lo que **puede saturar la lectura** aunque no exista un corto. Antes de fijar R2 o umbrales: medir el máximo, configurar `analogSetPinAttenuation(..., ADC_11db)`, comparar `analogReadMilliVolts()` con multímetro y redimensionar el divisor si supera el rango útil. Fuentes: [pinout XIAO](https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/) y [ADC Arduino-ESP32](https://docs.espressif.com/projects/arduino-esp32/en/latest/api/adc.html).
+
 ## Motor: aún NO conectar
 Si es **motor suelto** compatible con driver elegido: GPIO → resistencia serie gate (100–330 Ω inicial) → gate MOSFET; gate → 100kΩ → GND; source → GND; drain → motor negativo; motor positivo → fuente **nominal adecuada**; GND común controlado; diodo de rueda libre inverso (cátodo a +motor, ánodo a drain) si corresponde. **Verificar hoja de datos, encapsulado, fuente y corriente.** No conectar directamente motor al GPIO ni dar por hecho que 3V3 puede alimentarlo. Si motor es módulo con driver, diseñar según módulo, no por duplicación.
 

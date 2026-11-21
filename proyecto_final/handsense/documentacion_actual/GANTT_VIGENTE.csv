@@ -1,8 +1,8 @@
 ID,Tarea,Responsable,Inicio,Fin,Estado,Evidencia requerida
 G1,"Inventario REAL y compras",Cote,2026-11-20,2026-11-22,Por confirmar,"Fotos/modelos y boletas"
 G2,"Fritzing y montaje de mesa",Cote,2026-11-20,2026-11-23,Preparado,"Esquema y prueba de continuidad"
-G3,"Firmware XIAO y ADC",Alex,2026-11-20,2026-11-24,Preparado,"Compilación, UART y voltajes"
-G4,"Publicar Flutter/BLE local y contrato",Alex,2026-11-20,2026-11-23,Preparado,"Archivos, tests y UUID"
+G3,"Firmware XIAO y ADC",Alex,2026-11-20,2026-11-24,Parcial,"9 tests; faltan compilación XIAO, UART y voltajes"
+G4,"Publicar Flutter/BLE local y contrato",Alex,2026-11-20,2026-11-23,Verificado,"Fuentes y UUID en main; 7 tests y APK compilado"
 G5,"BLE real PING ACK",Alex,2026-11-21,2026-11-24,Pendiente,"Log de respuesta real"
 G6,"Calibración FSR/flex y error",Cote,2026-11-21,2026-11-25,Pendiente,"Tabla referencia y error"
 G7,"Driver motor y LED",Cote,2026-11-21,2026-11-25,Pendiente,"Tensión/corriente y video"

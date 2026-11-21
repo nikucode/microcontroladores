@@ -1,37 +1,32 @@
-# Proyecto final: HandSense
+# HandSense
 
-Proyecto de Alex Díaz y María José Córdova para la asignatura de Microcontroladores. La propuesta inicial fue evaluada con nota 7.
+Proyecto de **Alex Díaz y María José Córdoba** para Microcontroladores (UNAB). HandSense es un prototipo experimental vestible que combina flexión y contacto para estudiar una pinza pulgar–índice, explicar su clasificación y comunicar eventos a una aplicación Android. No es un dispositivo clínico ni mide fuerza o ángulo sin calibración.
 
-HandSense es un prototipo experimental para observar ejercicios simples de mano mediante dos sensores analógicos, retroalimentación visual y háptica, y una interfaz inalámbrica. El equipo construirá un solo prototipo físico para la entrega de noviembre de 2026. El syllabus sitúa la evaluación en la semana del 23; el día 25 es una fecha estimada por confirmar.
+## Ruta de lectura
 
-## Documentos
+1. [Estado vigente y prioridades](LEER_PRIMERO.md).
+2. [Auditoría consolidada](documentacion_actual/AUDITORIA_CONSOLIDADA_2026-11-21.md): matriz, contradicciones y estado Git.
+3. [Guía pedagógica](documentacion_actual/GUIA_PEDAGOGICA.md): sensores → divisor → ADC → algoritmo → actuadores → BLE → Flutter.
+4. [Reproducibilidad](documentacion_actual/REPRODUCIBILIDAD.md): comandos, resultados esperados y diagnóstico.
+5. [Cronología y decisiones](documentacion_actual/CRONOLOGIA_Y_DECISIONES.md): septiembre–noviembre con vacíos explícitos.
+6. [Montaje XIAO](documentacion_actual/MONTAJE_Y_CONEXIONES_XIAO.md), [inventario](documentacion_actual/INVENTARIO_Y_COMPRA.md) y [validación](validacion/PROTOCOLO_Y_CIERRE.md).
+7. [Gantt vigente](documentacion_actual/GANTT_VIGENTE.md) y [rúbrica/tríptico](documentacion_actual/RUBRICA_Y_AFICHE.md).
 
-- [Informe de avances PDF](informe/avance.pdf) y [fuente LaTeX](informe/avance.tex).
-- [Protocolo y matriz de cierre](validacion/PROTOCOLO_Y_CIERRE.md), [BOM pendiente](validacion/BOM.csv) y [plantilla de ensayos](validacion/ensayos.csv).
+## Qué existe
 
-- [Revisión de evidencia para la entrega](investigacion/2026-11-10_revision_para_entrega.md): qué está demostrado, antecedentes recientes, hipótesis de aporte y riesgos.
-- [Prompt maestro de planificación](PROMPT_MAESTRO_PLANIFICACION.md): instrucciones reutilizables para actualizar plan, informe, carta Gantt y visión futura con evidencia.
-- [Seguimiento de noviembre](SEGUIMIENTO_NOVIEMBRE.md): carta Gantt operativa y bitácora que se actualizan con cada sesión.
-- [Ruta a la entrega de noviembre](PLAN_ENTREGA_25_NOV.md): estado actual, decisiones pendientes, tareas de Alex y Cote, fechas y pruebas para una demostración completa.
-- [Plan de trabajo](PLAN_DE_TRABAJO.md): requisitos y pruebas previstos para el prototipo.
-- [Investigación de antecedentes, novedad y pivotes](investigacion/2026-10-28_antecedentes_novedad_y_pivotes.md): comparación con publicaciones, patentes y productos; propuesta de ajuste.
-- [Especificación experimental](investigacion/2026-10-28_especificacion_experimental.md): tarea elegida para investigar, hipótesis, arquitectura provisional y pruebas de decisión.
-- [Ruta sin hardware](RUTA_SIN_HARDWARE.md): herramientas, pasos de simulación y evidencia que se puede producir antes del montaje físico.
-- [App web de demostración](app/README.md): panel accesible con datos simulados y contrato HTTP previsto para conectar el ESP32.
-- [Investigación previa](investigacion/README.md): auditorías técnicas y materiales del curso.
+- `firmware/adquisicion/`: simulación histórica ESP32 DevKit con GPIO34/35.
+- `firmware/logica_gesto/`: filtro, histéresis, detector estricto y pruebas C++.
+- `firmware/ble_diagnostico/`: transporte GATT mínimo `PING`/`ACK`, preparado pero no probado en placa.
+- `mobile/`: aplicación Flutter Android con demostración separada de BLE, cuatro secciones y pruebas.
+- `app/`: demostración web histórica con datos simulados; no es la app móvil vigente.
+- `validacion/`: BOM provisional, protocolo y plantilla vacía de ensayos físicos.
+- `investigacion/` e `informe/`: antecedentes fechados; pueden contener decisiones reemplazadas.
 
-## Estado
+## Estado comprobado al 21/11/2026
 
-La [primera adquisición en Wokwi](firmware/adquisicion/README.md) incluye circuito con dos potenciómetros y firmware con salida CSV. Tres grabaciones documentan la puesta en marcha, la corrección de terminales y la respuesta independiente de ambos canales.
+- **Verificado en software:** 9 pruebas C++; 5 pruebas JavaScript; Flutter `analyze` limpio, 7 pruebas aprobadas y APK debug compilado por Alex.
+- **Simulado:** adquisición y dos escenarios de gesto en Wokwi con ESP32 DevKit.
+- **Implementado sin validar físicamente:** BLE Flutter, firmware BLE diagnóstico y netlist preliminar XIAO.
+- **Pendiente:** inventario físico exacto, firmware integrado XIAO, telemetría continua, sensores/ADC calibrados, motor/driver, BLE real, montaje vestible y ensayos.
 
-La [segunda simulación](firmware/logica_gesto/README.md) agrega filtro, histéresis, estados, conteo y LED para intentos completos e incompletos.
-
-La arquitectura propuesta usa ESP32. Los documentos iniciales mencionan una duda sobre su aceptación en la asignatura; se conservaron como registro histórico. La propuesta que incluía ESP32 fue entregada y evaluada con nota 7, según el equipo. Aún no hay evidencia de sensores, motor ni dashboard validados físicamente.
-
-El proyecto se describe como un **prototipo experimental**, sin afirmar eficacia terapéutica ni mediciones clínicas de fuerza o ángulo.
-
-## Compras y licencia (actualización del 10 de noviembre)
-
-Alex informó que ESP32 y sensores se compraron por AliExpress. Faltan modelos exactos y fecha de recepción. El equipo planea comprar componentes complementarios en San Diego. Consultar la BOM antes de duplicar compras.
-
-No se encontró una licencia explícita en HandSense ni una licencia general del repositorio. La elección sigue pendiente de los autores; este registro no concede una licencia nueva.
+La feria está documentada para el **27/11/2026**. Los planes titulados “25 NOV” y el póster A1 se conservan solo como historia; el formato vigente es tríptico horizontal de **77 × 55 cm**.

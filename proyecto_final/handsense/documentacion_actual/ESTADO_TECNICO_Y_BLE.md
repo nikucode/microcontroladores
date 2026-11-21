@@ -3,12 +3,12 @@
 ## Confirmaciones respaldadas por registros de Codex / terminal
 - Flutter Android local: navegación Inicio/Ejercicio/Historial/Ajustes y modo demostración. **7 pruebas Flutter aprobadas**, `flutter analyze` sin problemas y **APK debug compilado** luego de resolver dependencias Android.
 - Dependencias de compilación registradas: `flutter_reactive_ble 5.5.0`, `permission_handler 12.0.3`; módulos transitivos reactive_ble 5.5.0 fijados y ajuste compileSdk 36 en Gradle.
-- Pruebas de lógica C++: **5 aprobadas** en sesión Codex.
-- Codex creó localmente `mobile/lib/data/ble_attempt_source.dart`, `handsense_protocol.dart` y `firmware/ble_diagnostico/sketch.ino`; los logs no sustituyen al código fuente.
+- Pruebas de lógica C++: **9 aprobadas** el 21-11; incluyen orden inverso, simultaneidad, liberación invertida y recuperación.
+- `mobile/` y `firmware/ble_diagnostico/sketch.ino` están versionados en `main`; los logs no sustituyen una prueba física.
 - Wokwi: secuencia de pinza completa `fusion=1 flex_solo=1 inc=0` y flexión sin contacto `fusion=0 flex_solo=1 inc=1`, observadas en simulación.
 
 ## Pendiente de verificar
-- **Instalación y prueba del APK BLE actualizado en teléfono** (la primera versión de Flutter sí se instaló).
+- **Instalación y prueba del APK BLE actualizado en teléfono** (el APK actualizado compiló; ADB no encontró un teléfono conectado en el intento registrado).
 - BLE físico ESP32 ↔ nRF Connect ↔ Flutter; aún sin registro real de `ACK`.
 - ADC, sensores, motor y calibración física; persistencia al reiniciar.
 - Historial persistente; actualmente se describió historial en memoria.
@@ -20,9 +20,9 @@
 - Control por característica GATT escribible: enviar **texto UTF-8** `HS1,C,PING`.
 - Respuesta de ESP32 esperada en notificaciones: `HS1,A,PING,OK`.
 - Tramas de eventos con versión y secuencia según `mobile/lib/data/handsense_protocol.dart`.
-- **UUID exactos:** leer de `app/PROTOCOLO.md` **local actualizado** y `firmware/ble_diagnostico/sketch.ino`; **no se pudieron inspeccionar aquí**, así que no inventarlos.
+- **UUID exactos:** servicio `6c7a0001-8e2d-4f91-a6b5-3d3f7a120001`, eventos `6c7a0002-8e2d-4f91-a6b5-3d3f7a120001`, control `6c7a0003-8e2d-4f91-a6b5-3d3f7a120001`.
 
-**ADVERTENCIA:** un laboratorio BLE diseñado anteriormente fuera de Codex usaba `PING` → `ACK,PING` y `RATE=500`. **No es el protocolo vigente del Codex**. No mezclarlos. El archivo `app/PROTOCOLO.md` publicado a fecha de corte aún describe Wi-Fi/HTTP; es documentación histórica, NO contrato BLE actual.
+**ADVERTENCIA:** un laboratorio BLE anterior usaba `PING` → `ACK,PING` y `RATE=500`. **No es el protocolo vigente**. `app/PROTOCOLO.md` contiene primero el contrato BLE actual y después el HTTP histórico; no mezclarlos.
 
 ## Acciones obligatorias para sincronizar el repositorio
 1. En el computador con Codex: `git status --short`, `git branch -vv`, `git fetch origin`, `git log --oneline --all -12`.

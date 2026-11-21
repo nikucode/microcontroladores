@@ -1,4 +1,4 @@
-# Trabajo en paralelo — Alex Díaz y María José Córdova
+# Trabajo en paralelo — Alex Díaz y María José Córdoba
 
 **Límite:** otras clases, entregas y compromisos; **NO exigir trabajo diario**. Estimaciones de planificación: ~15 horas activas por persona, ajustables a disponibilidad real.
 

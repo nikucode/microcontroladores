@@ -1,6 +1,6 @@
 # HANDSENSE — LEER PRIMERO (20-11-2026)
 
-**Equipo:** Alex Díaz y María José Córdova («Cote»). **Asignatura:** Microcontroladores, UNAB. **Feria:** **viernes 27 de noviembre de 2026, 09:00–13:00**, según rúbrica entregada por el docente.
+**Equipo:** Alex Díaz y María José Córdoba («Cote»). **Asignatura:** Microcontroladores, UNAB. **Feria:** **viernes 27 de noviembre de 2026, 09:00–13:00**, según rúbrica entregada por el docente.
 
 > **Documento de continuidad para consultar desde cualquier celular sin acceso a nuestros chats.** Si ves una contradicción entre documentos antiguos y esta carpeta, revisa el estado y la fuente aquí; no interpretes una propuesta como medición.
 
@@ -9,7 +9,7 @@
 - **Placa elegida:** **Seeed Studio XIAO ESP32-C3** (con antena), 3,3 V, BLE. El ESP32 DevKit de simulación utilizaba GPIO34/35 y **NO** comparte el pinout.
 - **Dos entradas:** sensor flexivo 2,2" y FSR402, mediante divisores resistivos a 3,3 V.
 - **Salidas:** LED verde, LED ámbar y motor vibrador mediante etapa de control; motor **sin conectar hasta comprobar modelo, alimentación y driver**. Dos LED ya satisfacen dos salidas actuadoras en el sentido literal, pero la propuesta comprometió también vibración.
-- **App:** Flutter Android local. En sesión Codex se verificaron análisis limpio, **7 pruebas Flutter aprobadas y APK de depuración compilado**; no confundir con BLE físicamente confirmado.
+- **App:** Flutter Android publicada en `main`. Alex verificó análisis limpio, **7 pruebas Flutter aprobadas y APK de depuración compilado**; no confundir con BLE físicamente confirmado.
 - **Comunicación elegida:** BLE GATT y diagnóstico con nRF Connect; **no** Wi-Fi HTTP del documento histórico app/PROTOCOLO.md.
 - **Pruebas de simulación:** pinza completa y flexión sin contacto observadas en Wokwi; pruebas reales de sensores/driver/BLE integrados **sin evidencia verificada disponible aquí**.
 - **Rúbrica:** funcionamiento 25 %, ADC 20 %, código 20 %, BLE/app 15 %, montaje/Gantt 10 %, tríptico/stand 10 %.
@@ -26,7 +26,7 @@
 
 ## Prioridad al retomar
 1. Confirmar inventario **real comprado y disponible** (no confundir una cotización con una compra).
-2. Conservar y subir el **código local de Flutter y firmware BLE**: no está en `main` remoto a 20-11.
+2. Instalar el APK BLE ya compilado y registrar el recorrido manual en el teléfono.
 3. Validar placa sin sensores: BLE anuncio → `PING/ACK` → Flutter.
 4. Montar ADC/LED en mesa y medir señales; motor separado; integrar.
 5. Sustituir evidencias simuladas del tríptico con resultados reales, imprimir y ensayar.

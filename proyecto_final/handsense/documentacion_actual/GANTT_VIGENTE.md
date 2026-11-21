@@ -10,8 +10,8 @@
 |---|---|---|---|---|---|
 | G1 | Confirmar inventario REAL, placa/motor/driver, precios y disponibilidad | Cote | 20–22 nov | ? | Tabla con fotos/modelos y comprados |
 | G2 | Unificar pines, divisores y esquema de montaje, Fritzing y mesa | Cote | 20–23 nov | ◐ diseño netlist; .fzz pendiente | Esquema + protoboard sin cortos |
-| G3 | Conservar pruebas de lógica y configurar firmware XIAO ADC/LED | Alex | 20–24 nov | ◐ lógica antigua simulada | GPIO reales y lecturas en serie |
-| G4 | Publicar código Flutter/BLE local y contrato GATT | Alex | 20–23 nov | ◐ APK compilado, fuente no publicada | archivos + tests + UUID coherentes |
+| G3 | Conservar pruebas de lógica y configurar firmware XIAO ADC/LED | Alex | 20–24 nov | ◐ 9 pruebas pasan; integración XIAO pendiente | GPIO reales y lecturas en serie |
+| G4 | Publicar código Flutter/BLE local y contrato GATT | Alex | 20–23 nov | ✅ fuente y pruebas en `main`; APK compilado | archivos + tests + UUID coherentes |
 | G5 | Ejecutar BLE real con nRF Connect y Flutter (`PING/ACK`) | Alex | 21–24 nov | ☐ | log/video de respuesta real |
 | G6 | Probar flex/FSR, voltajes y ADC vs multímetro | Cote | 21–25 nov | ☐ | CSV con rango y error |
 | G7 | Probar LED, driver y motor independientemente | Cote | 21–25 nov | ☐ | video + corriente/tensión |

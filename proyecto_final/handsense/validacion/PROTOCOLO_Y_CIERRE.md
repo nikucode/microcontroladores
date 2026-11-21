@@ -5,7 +5,7 @@ Este protocolo se fija antes de medir hardware. Los criterios son objetivos de i
 | Requisito | Evidencia actual | Prueba para cerrar | Estado |
 |---|---|---|---|
 | Dos ADC | Potenciómetros Wokwi | Cada sensor real cambia independientemente; registrar reposo y gesto | Simulado |
-| Conteo | Cinco pruebas C++ | Secuencias observadas manualmente y comparación en las mismas señales | Parcial |
+| Conteo | Nueve pruebas C++ | Secuencias observadas manualmente y comparación en las mismas señales | Parcial |
 | LED y motor | LED simulado | Activación física, corriente y ausencia de reinicios; percepción del pulso | Pendiente |
 | Memoria | Propuesta | Guardar calibración válida, apagar y recuperar mismos parámetros | Pendiente |
 | BLE/app | App Android, contrato GATT v1 y parser | Descubrimiento, evento real, reconexión y `PING` con ACK verificados | Parcial; falta ESP32 físico |
@@ -13,9 +13,9 @@ Este protocolo se fija antes de medir hardware. Los criterios son objetivos de i
 
 ## Brechas del código que condicionan la integración
 
-- Actualizado: la app conserva la demostración y prepara una fuente BLE separada. El parser distingue los cinco eventos y descarta secuencias repetidas; falta descargar dependencias, compilar el APK actualizado y verificar GATT con el ESP32 físico.
+- Actualizado: la app conserva la demostración y usa una fuente BLE separada. El parser distingue los cinco eventos y descarta secuencias repetidas; Alex verificó análisis, 7 pruebas y APK. Falta verificar GATT con el ESP32 físico.
 - ERROR_SENAL y calibración inválida son escenarios de la app; el detector no implementa ese bloqueo todavía.
-- La regla actual recuerda haber visto flexión y contacto. Debe documentarse qué orden/solapamiento se acepta y probar contacto primero, flexión primero y entradas simultáneas.
+- La regla estricta exige flexión antes de contacto y liberación de contacto antes de flexión. Las pruebas cubren contacto primero, simultaneidad, liberación invertida, timeout y recuperación.
 - Los 3 segundos y umbrales del sketch son provisionales. No utilizarlos como tiempo terapéutico ni umbral universal.
 
 ## Calibración propuesta
