@@ -18,7 +18,7 @@ HandSense es un **prototipo experimental**, no clínicamente validado, diseñado
 | Ver qué código existe y qué se probó | [Reproducción de pruebas](documentacion_actual/REPRODUCIBILIDAD.md) |
 | Distinguir diseño, evidencia y riesgos | [Auditoría documental](documentacion_actual/AUDITORIA_REPOSITORIO_2026-11-20.md) |
 | Entender cambios desde septiembre | [Cronología y decisiones](documentacion_actual/CRONOLOGIA_Y_DECISIONES.md) |
-| Revisar responsabilidades y fecha | [Coordinación](documentacion_actual/COORDINACION.md) y [Gantt de cierre](documentacion_actual/GANTT_VIGENTE.md) |
+| Revisar responsabilidades y fechas | [Coordinación](documentacion_actual/COORDINACION.md), [Gantt integral septiembre–noviembre](documentacion_actual/GANTT_INTEGRAL.md) y [Gantt de cierre](documentacion_actual/GANTT_VIGENTE.md) |
 | Entender qué exige el profesor | [Rúbrica y tríptico](documentacion_actual/RUBRICA_Y_AFICHE.md) |
 | Ayudar a mantener GitHub autosuficiente | [Reglas de documentación](documentacion_actual/COMO_ACTUALIZAR_REPOSITORIO.md) |
 
