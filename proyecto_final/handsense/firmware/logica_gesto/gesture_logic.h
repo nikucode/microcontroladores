@@ -75,39 +75,64 @@ class GestureDetector {
         return result(event, flexActive, contactActive);
       attemptActive_ = true;
       attemptStartMs_ = nowMs;
+      // Una pinza estricta comienza con flexion sola. Contacto primero o
+      // activacion simultanea se conservan como intento incompleto, pero nunca
+      // pueden convertirse mas tarde en COMPLETA.
+      validOrder_ = flexActive && !contactActive;
     }
 
     seenFlex_ = seenFlex_ || flexActive;
     seenContact_ = seenContact_ || contactActive;
 
-    if (seenFlex_ && seenContact_) {
-      if (contactActive)
+    if (!validOrder_) {
+      state_ = contactActive ? GestureState::CONTACTO : GestureState::FLEXION;
+      if (!flexActive && !contactActive) {
+        event = invalidEvent_;
+        ++incomplete_;
+        resetAttempt();
+        return result(event, flexActive, contactActive);
+      }
+    } else if (state_ == GestureState::REPOSO ||
+               state_ == GestureState::FLEXION) {
+      state_ = GestureState::FLEXION;
+      if (contactActive && flexActive) {
         state_ = GestureState::CONTACTO;
-      else if (flexActive)
+      } else if (!flexActive) {
+        event = GestureEvent::SIN_CONTACTO;
+        ++incomplete_;
+        resetAttempt();
+        return result(event, flexActive, contactActive);
+      }
+    } else if (state_ == GestureState::CONTACTO) {
+      if (!flexActive && contactActive) {
+        validOrder_ = false;
+        invalidEvent_ = GestureEvent::SIN_LIBERACION;
+      } else if (flexActive && !contactActive) {
         state_ = GestureState::LIBERACION;
-      else {
+      } else if (!flexActive && !contactActive) {
+        event = GestureEvent::SIN_LIBERACION;
+        ++incomplete_;
+        resetAttempt();
+        return result(event, flexActive, contactActive);
+      }
+    } else if (state_ == GestureState::LIBERACION) {
+      if (contactActive) {
+        state_ = GestureState::CONTACTO;
+      } else if (!flexActive) {
         ++repetitions_;
         event = GestureEvent::COMPLETA;
         resetAttempt();
         return result(event, flexActive, contactActive);
       }
-    } else if (flexActive) {
-      state_ = GestureState::FLEXION;
-    } else if (contactActive) {
-      state_ = GestureState::CONTACTO;
-    } else {
-      event = seenFlex_ ? GestureEvent::SIN_CONTACTO
-                        : GestureEvent::SIN_FLEXION;
-      ++incomplete_;
-      resetAttempt();
-      return result(event, flexActive, contactActive);
     }
 
     if (nowMs - attemptStartMs_ >= timeoutMs_) {
-      event = (seenFlex_ && seenContact_)
-                  ? GestureEvent::SIN_LIBERACION
-                  : (seenFlex_ ? GestureEvent::SIN_CONTACTO
-                               : GestureEvent::SIN_FLEXION);
+      event = !validOrder_
+                  ? invalidEvent_
+                  : ((seenFlex_ && seenContact_)
+                         ? GestureEvent::SIN_LIBERACION
+                         : (seenFlex_ ? GestureEvent::SIN_CONTACTO
+                                      : GestureEvent::SIN_FLEXION));
       ++incomplete_;
       state_ = GestureState::ESPERA_REPOSO;
     }
@@ -126,6 +151,8 @@ class GestureDetector {
     attemptActive_ = false;
     seenFlex_ = false;
     seenContact_ = false;
+    validOrder_ = false;
+    invalidEvent_ = GestureEvent::SIN_FLEXION;
   }
 
   ThresholdLatch flex_;
@@ -135,6 +162,8 @@ class GestureDetector {
   bool attemptActive_ = false;
   bool seenFlex_ = false;
   bool seenContact_ = false;
+  bool validOrder_ = false;
+  GestureEvent invalidEvent_ = GestureEvent::SIN_FLEXION;
   uint32_t attemptStartMs_ = 0;
   uint32_t repetitions_ = 0;
   uint32_t incomplete_ = 0;

@@ -34,7 +34,8 @@ int main() {
   }
   {
     auto detector = makeDetector();
-    detector.update(80, 80, 0);
+    detector.update(80, 0, 0);
+    detector.update(80, 80, 100);
     const auto timeout = detector.update(80, 80, 3000);
     assert(timeout.event == GestureEvent::SIN_LIBERACION);
     assert(timeout.state == GestureState::ESPERA_REPOSO);
@@ -53,5 +54,41 @@ int main() {
     const auto released = detector.update(34, 0, 200);
     assert(!released.flexActive);
   }
-  std::cout << "5 pruebas de lógica HandSense aprobadas\n";
+  {
+    auto detector = makeDetector();
+    detector.update(0, 80, 0);       // contacto antes que flexion
+    detector.update(80, 80, 100);
+    detector.update(80, 0, 200);
+    const auto result = detector.update(0, 0, 300);
+    assert(result.event == GestureEvent::SIN_FLEXION);
+    assert(result.repetitions == 0 && result.incomplete == 1);
+  }
+  {
+    auto detector = makeDetector();
+    detector.update(80, 80, 0);      // ambas senales simultaneas
+    detector.update(80, 0, 100);
+    const auto result = detector.update(0, 0, 200);
+    assert(result.event == GestureEvent::SIN_FLEXION);
+    assert(result.repetitions == 0 && result.incomplete == 1);
+  }
+  {
+    auto detector = makeDetector();
+    detector.update(80, 0, 0);
+    detector.update(80, 80, 100);
+    detector.update(0, 80, 200);     // libera flexion antes del contacto
+    const auto result = detector.update(0, 0, 300);
+    assert(result.event == GestureEvent::SIN_LIBERACION);
+    assert(result.repetitions == 0 && result.incomplete == 1);
+  }
+  {
+    auto detector = makeDetector();
+    detector.update(0, 80, 0);
+    const auto timeout = detector.update(80, 80, 3000);
+    assert(timeout.event == GestureEvent::SIN_FLEXION);
+    assert(timeout.state == GestureState::ESPERA_REPOSO);
+    detector.update(0, 0, 3100);
+    const auto recovered = detector.update(80, 0, 3200);
+    assert(recovered.state == GestureState::FLEXION);
+  }
+  std::cout << "9 pruebas de lógica HandSense aprobadas\n";
 }
