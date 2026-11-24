@@ -50,6 +50,20 @@ class _HandSenseAppState extends State<HandSenseApp> {
     );
   }
 
+  Future<void> _resetDevice(BuildContext context) async {
+    final acknowledged = await model.resetDeviceSession();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          acknowledged
+              ? 'El ESP32 reinició la sesión y confirmó el comando.'
+              : 'El ESP32 no confirmó el reinicio en 3 segundos.',
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'HandSense',
@@ -97,6 +111,7 @@ class _HandSenseAppState extends State<HandSenseApp> {
                     onUseDevice: () => _useDevice(context),
                     onUseDemo: _useDemo,
                     onPing: () => _ping(context),
+                    onResetDevice: () => _resetDevice(context),
                   ),
                   1 => ExerciseScreen(
                     model: model,

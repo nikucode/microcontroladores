@@ -30,9 +30,19 @@ class AcknowledgementFrame extends HandSenseFrame {
   final bool ok;
 }
 
+class TelemetryFrame extends HandSenseFrame {
+  const TelemetryFrame(this.flexionPercent, this.contactPercent, this.phase);
+  final int flexionPercent;
+  final int contactPercent;
+  final GesturePhase phase;
+}
+
 /// Eventos: `HS1,E,<secuencia>,<codigo>`.
 /// C=completa, NC=sin contacto, NF=sin flexión, NR=sin liberación,
-/// U=no evaluable. Confirmaciones: `HS1,A,<comando>,OK|ERR`.
+/// U=no evaluable. Telemetría: `HS1,T,<flex%>,<contacto%>,<estado>`.
+/// Estados: R=reposo, F=flexión, C=contacto, L=liberación,
+/// W=espera de reposo, U=señal no evaluable.
+/// Confirmaciones: `HS1,A,<comando>,OK|ERR`.
 HandSenseFrame? parseHandSenseFrame(List<int> bytes) {
   final text = utf8.decode(bytes, allowMalformed: true).trim();
   final fields = text.split(',');
@@ -54,6 +64,30 @@ HandSenseFrame? parseHandSenseFrame(List<int> bytes) {
 
   if (fields[1] == 'A') {
     return AcknowledgementFrame(fields[2], fields[3] == 'OK');
+  }
+
+  if (fields[1] == 'T' && fields.length == 5) {
+    final flexion = int.tryParse(fields[2]);
+    final contact = int.tryParse(fields[3]);
+    final phase = switch (fields[4]) {
+      'R' => GesturePhase.rest,
+      'F' => GesturePhase.flexion,
+      'C' => GesturePhase.contact,
+      'L' => GesturePhase.release,
+      'W' => GesturePhase.waitForRest,
+      'U' => GesturePhase.signalError,
+      _ => null,
+    };
+    if (flexion == null ||
+        contact == null ||
+        flexion < 0 ||
+        flexion > 100 ||
+        contact < 0 ||
+        contact > 100 ||
+        phase == null) {
+      return null;
+    }
+    return TelemetryFrame(flexion, contact, phase);
   }
   return null;
 }

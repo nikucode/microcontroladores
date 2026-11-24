@@ -54,14 +54,35 @@ class HandSenseConnectionState {
   bool get connected => phase == DeviceConnectionPhase.connected;
 }
 
+enum GesturePhase { rest, flexion, contact, release, waitForRest, signalError }
+
+class DeviceTelemetry {
+  const DeviceTelemetry(this.flexionPercent, this.contactPercent, this.phase);
+
+  final int flexionPercent;
+  final int contactPercent;
+  final GesturePhase phase;
+
+  String get phaseLabel => switch (phase) {
+    GesturePhase.rest => 'Reposo',
+    GesturePhase.flexion => 'Flexión',
+    GesturePhase.contact => 'Contacto',
+    GesturePhase.release => 'Liberación',
+    GesturePhase.waitForRest => 'Espera volver a reposo',
+    GesturePhase.signalError => 'Señal no evaluable',
+  };
+}
+
 /// Capacidades exclusivas de una fuente física. La demostración no implementa
 /// esta interfaz, por lo que sus datos nunca se confunden con mediciones BLE.
 abstract class DeviceControls {
   Stream<HandSenseConnectionState> get connectionStates;
+  Stream<DeviceTelemetry> get telemetry;
   HandSenseConnectionState get connectionState;
   Future<void> connect();
   Future<void> disconnect();
   Future<bool> ping();
+  Future<bool> resetDeviceSession();
 }
 
 abstract class DemoControls {

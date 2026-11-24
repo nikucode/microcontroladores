@@ -37,5 +37,22 @@ void main() {
     expect(acknowledgement.command, 'PING');
     expect(acknowledgement.ok, isTrue);
     expect(HandSenseGatt.command('PING').length, lessThanOrEqualTo(20));
+    expect(HandSenseGatt.command('RESET').length, lessThanOrEqualTo(20));
   });
+
+  test(
+    'decodifica telemetría real y rechaza porcentajes o estados inválidos',
+    () {
+      final frame = parseHandSenseFrame(utf8.encode('HS1,T,73,64,C'));
+      expect(frame, isA<TelemetryFrame>());
+      final telemetry = frame! as TelemetryFrame;
+      expect(telemetry.flexionPercent, 73);
+      expect(telemetry.contactPercent, 64);
+      expect(telemetry.phase, GesturePhase.contact);
+
+      expect(parseHandSenseFrame(utf8.encode('HS1,T,101,20,R')), isNull);
+      expect(parseHandSenseFrame(utf8.encode('HS1,T,20,-1,R')), isNull);
+      expect(parseHandSenseFrame(utf8.encode('HS1,T,20,30,X')), isNull);
+    },
+  );
 }

@@ -14,6 +14,14 @@
 - Historial persistente; actualmente se describió historial en memoria.
 - Fritzing .fzz y simulación eléctrica de montaje real.
 
+## Candidato integrado del 24-11
+
+`firmware/xiao_integrado/` reúne los GPIO reales, calibración NVS, detector,
+dos LED, BLE, telemetría y comandos `PING`/`RESET`. La app puede mostrar
+flexión/contacto relativos y estado en vivo. **Todavía no se ha compilado ni
+probado en XIAO**, por lo que sigue clasificado como implementado sin validar.
+El buzzer está deshabilitado hasta identificar su tipo y corriente.
+
 ## Fuente principal: protocolo BLE preparado por Codex
 **Diagnóstico BLE**:
 - Nombre anunciado: `HandSense-BLE-Lab` (solo si la versión local coincide).

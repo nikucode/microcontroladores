@@ -17,11 +17,13 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
   final _states = StreamController<HandSenseConnectionState>.broadcast(
     sync: true,
   );
+  final _telemetry = StreamController<DeviceTelemetry>.broadcast(sync: true);
   final Set<int> _seenSequences = {};
   StreamSubscription<DiscoveredDevice>? _scanSubscription;
   StreamSubscription<ConnectionStateUpdate>? _connectionSubscription;
   StreamSubscription<List<int>>? _eventSubscription;
-  Completer<bool>? _pendingPing;
+  Completer<bool>? _pendingCommand;
+  String? _pendingCommandName;
   String? _deviceId;
   bool _disposed = false;
 
@@ -38,6 +40,8 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
   bool get isDemo => false;
   @override
   Stream<HandSenseConnectionState> get connectionStates => _states.stream;
+  @override
+  Stream<DeviceTelemetry> get telemetry => _telemetry.stream;
   @override
   HandSenseConnectionState get connectionState => _state;
 
@@ -208,22 +212,43 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
         if (_seenSequences.add(sequence)) {
           _attempts.add(Attempt(sequence, outcome));
         }
-      case AcknowledgementFrame(command: 'PING', :final ok):
-        final pending = _pendingPing;
-        if (pending != null && !pending.isCompleted) pending.complete(ok);
+      case AcknowledgementFrame(:final command, :final ok):
+        final pending = _pendingCommand;
+        if (command == _pendingCommandName &&
+            pending != null &&
+            !pending.isCompleted) {
+          pending.complete(ok);
+        }
+      case TelemetryFrame(
+        :final flexionPercent,
+        :final contactPercent,
+        :final phase,
+      ):
+        _telemetry.add(DeviceTelemetry(flexionPercent, contactPercent, phase));
       case null:
-        break;
-      default:
         break;
     }
   }
 
   @override
   Future<bool> ping() async {
+    return _sendCommand('PING');
+  }
+
+  @override
+  Future<bool> resetDeviceSession() async {
+    final acknowledged = await _sendCommand('RESET');
+    if (acknowledged) _seenSequences.clear();
+    return acknowledged;
+  }
+
+  Future<bool> _sendCommand(String name) async {
     final deviceId = _deviceId;
     if (deviceId == null || !_state.connected) return false;
+    if (_pendingCommand != null) return false;
     final pending = Completer<bool>();
-    _pendingPing = pending;
+    _pendingCommand = pending;
+    _pendingCommandName = name;
     final characteristic = QualifiedCharacteristic(
       serviceId: Uuid.parse(HandSenseGatt.service),
       characteristicId: Uuid.parse(HandSenseGatt.control),
@@ -232,7 +257,7 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
     try {
       await _ble.writeCharacteristicWithResponse(
         characteristic,
-        value: HandSenseGatt.command('PING'),
+        value: HandSenseGatt.command(name),
       );
       return await pending.future.timeout(
         const Duration(seconds: 3),
@@ -241,7 +266,10 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
     } catch (_) {
       return false;
     } finally {
-      if (identical(_pendingPing, pending)) _pendingPing = null;
+      if (identical(_pendingCommand, pending)) {
+        _pendingCommand = null;
+        _pendingCommandName = null;
+      }
     }
   }
 
@@ -255,9 +283,10 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
     _connectionSubscription = null;
     _deviceId = null;
     _seenSequences.clear();
-    final pending = _pendingPing;
+    final pending = _pendingCommand;
     if (pending != null && !pending.isCompleted) pending.complete(false);
-    _pendingPing = null;
+    _pendingCommand = null;
+    _pendingCommandName = null;
     if (announce && !_disposed) {
       _setState(
         DeviceConnectionPhase.disconnected,
@@ -272,9 +301,10 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
     _scanSubscription?.cancel();
     _eventSubscription?.cancel();
     _connectionSubscription?.cancel();
-    final pending = _pendingPing;
+    final pending = _pendingCommand;
     if (pending != null && !pending.isCompleted) pending.complete(false);
     _attempts.close();
     _states.close();
+    _telemetry.close();
   }
 }

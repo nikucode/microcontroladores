@@ -13,6 +13,9 @@ class SessionModel extends ChangeNotifier {
   AttemptSource get source => _source;
   StreamSubscription<Attempt>? _subscription;
   StreamSubscription<HandSenseConnectionState>? _connectionSubscription;
+  StreamSubscription<DeviceTelemetry>? _telemetrySubscription;
+  DeviceTelemetry? _telemetry;
+  DeviceTelemetry? get telemetry => _telemetry;
   HandSenseConnectionState _connectionState = const HandSenseConnectionState(
     DeviceConnectionPhase.idle,
     'Modo demostración: no hay sensores físicos conectados.',
@@ -32,6 +35,11 @@ class SessionModel extends ChangeNotifier {
       _connectionState = device.connectionState;
       _connectionSubscription = device.connectionStates.listen((state) {
         _connectionState = state;
+        if (!state.connected) _telemetry = null;
+        notifyListeners();
+      });
+      _telemetrySubscription = device.telemetry.listen((reading) {
+        _telemetry = reading;
         notifyListeners();
       });
     } else {
@@ -39,6 +47,7 @@ class SessionModel extends ChangeNotifier {
         DeviceConnectionPhase.idle,
         'Modo demostración: no hay sensores físicos conectados.',
       );
+      _telemetry = null;
     }
   }
 
@@ -61,6 +70,7 @@ class SessionModel extends ChangeNotifier {
     if (_attempts.isNotEmpty) finish();
     await _subscription?.cancel();
     await _connectionSubscription?.cancel();
+    await _telemetrySubscription?.cancel();
     _source.dispose();
     _source = next;
     _listenToSource();
@@ -77,6 +87,15 @@ class SessionModel extends ChangeNotifier {
 
   Future<bool> ping() async {
     if (_source case final DeviceControls device) return device.ping();
+    return false;
+  }
+
+  Future<bool> resetDeviceSession() async {
+    if (_source case final DeviceControls device) {
+      final acknowledged = await device.resetDeviceSession();
+      if (acknowledged) reset();
+      return acknowledged;
+    }
     return false;
   }
 
@@ -104,6 +123,7 @@ class SessionModel extends ChangeNotifier {
   void dispose() {
     _subscription?.cancel();
     _connectionSubscription?.cancel();
+    _telemetrySubscription?.cancel();
     _source.dispose();
     super.dispose();
   }

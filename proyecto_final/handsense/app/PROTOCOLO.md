@@ -42,6 +42,23 @@ La app solo informa que el ESP32 confirmó la orden si recibe el `ACK` en menos
 de tres segundos. Que Android acepte la escritura GATT no se considera una
 confirmación del firmware.
 
+La versión integrada añade telemetría relativa, enviada aproximadamente cada
+250 ms:
+
+```text
+HS1,T,<flexion_pct>,<contacto_pct>,<estado>
+```
+
+Los porcentajes son enteros 0–100 relativos a la calibración, no grados ni
+newtons. Estados: `R` reposo, `F` flexión, `C` contacto, `L` liberación, `W`
+espera de reposo, `U` señal no evaluable. El segundo comando reinicia los
+contadores de la sesión, sin borrar la calibración:
+
+```text
+Teléfono → Control: HS1,C,RESET
+ESP32 → Eventos:    HS1,A,RESET,OK
+```
+
 ## Contrato HTTP histórico
 
 **Estado:** propuesta anterior conservada como antecedente; ya no es el camino

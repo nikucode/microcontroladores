@@ -41,6 +41,56 @@ class SourceNotice extends StatelessWidget {
   );
 }
 
+class TelemetryPanel extends StatelessWidget {
+  const TelemetryPanel({super.key, required this.model});
+  final SessionModel model;
+
+  @override
+  Widget build(BuildContext context) {
+    final telemetry = model.telemetry;
+    if (model.isDemo) return const SizedBox.shrink();
+    return Panel(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Señales en tiempo real',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          if (!model.isConnected || telemetry == null)
+            const Text('Esperando telemetría válida del ESP32…')
+          else ...[
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                'Estado: ${telemetry.phaseLabel}',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            const SizedBox(height: 8),
+            if (telemetry.phase == GesturePhase.signalError)
+              const Text(
+                'El conteo está bloqueado. Registra reposo y pinza en el ESP32 antes de interpretar las señales.',
+              )
+            else ...[
+              Text('Flexión relativa: ${telemetry.flexionPercent} %'),
+              LinearProgressIndicator(value: telemetry.flexionPercent / 100),
+              const SizedBox(height: 8),
+              Text('Contacto relativo: ${telemetry.contactPercent} %'),
+              LinearProgressIndicator(value: telemetry.contactPercent / 100),
+              const SizedBox(height: 8),
+              const Text(
+                'Porcentajes relativos a la calibración del prototipo; no son grados ni newtons.',
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
@@ -49,12 +99,14 @@ class HomeScreen extends StatelessWidget {
     required this.onUseDevice,
     required this.onUseDemo,
     required this.onPing,
+    required this.onResetDevice,
   });
   final SessionModel model;
   final VoidCallback onExercise;
   final VoidCallback onUseDevice;
   final VoidCallback onUseDemo;
   final VoidCallback onPing;
+  final VoidCallback onResetDevice;
   @override
   Widget build(BuildContext context) => PageContent(
     children: [
@@ -98,13 +150,18 @@ class HomeScreen extends StatelessWidget {
                     onPressed: onUseDemo,
                     child: const Text('Volver a demostración'),
                   ),
-                  if (model.isConnected)
+                  if (model.isConnected) ...[
                     FilledButton(
                       key: const ValueKey('ping-device'),
                       onPressed: onPing,
                       child: const Text('Comprobar conexión'),
-                    )
-                  else
+                    ),
+                    OutlinedButton(
+                      key: const ValueKey('reset-device'),
+                      onPressed: onResetDevice,
+                      child: const Text('Reiniciar sesión'),
+                    ),
+                  ] else
                     FilledButton(
                       key: const ValueKey('retry-device'),
                       onPressed: onUseDevice,
@@ -116,6 +173,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+      TelemetryPanel(model: model),
       FilledButton.icon(
         key: const ValueKey('start-demo'),
         onPressed: onExercise,
@@ -207,6 +265,7 @@ class ExerciseScreen extends StatelessWidget {
     children: [
       heading(context, 'La pinza, paso a paso'),
       SourceNotice(model: model),
+      TelemetryPanel(model: model),
       const Panel(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

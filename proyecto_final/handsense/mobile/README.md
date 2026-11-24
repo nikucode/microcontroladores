@@ -53,7 +53,7 @@ Estado de la integración BLE 0.3:
 - El primer intento con dependencias recientes exigió Android SDK 37. Se fijaron `flutter_reactive_ble 5.5.0`, `permission_handler 12.0.3` y módulos BLE transitivos 5.5.0; Alex repitió la suite y compiló el APK con SDK 36.
 - Alex repitió `flutter analyze`, `flutter test` y `flutter build apk --debug`: análisis limpio, **7 pruebas aprobadas** y APK generado. La instalación falló únicamente porque ADB no detectó un teléfono; BLE físico sigue pendiente.
 
-Contrato mínimo del ESP32: anunciar el servicio y características definidos en `lib/data/handsense_protocol.dart`, notificar `HS1,E,<secuencia>,<código>` y responder `HS1,A,PING,OK` al recibir `HS1,C,PING`.
+Contrato del ESP32 integrado: anunciar el servicio y características definidos en `lib/data/handsense_protocol.dart`, notificar eventos `HS1,E,<secuencia>,<código>`, telemetría `HS1,T,<flex%>,<contacto%>,<estado>` y confirmar `PING` y `RESET`. Los porcentajes se rotulan como relativos, no como unidades físicas.
 
 ## Recorrido manual en teléfono
 
