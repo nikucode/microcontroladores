@@ -1,6 +1,6 @@
 # HandSense móvil — experiencia Android y base BLE 0.3
 
-Cuatro destinos: Inicio, Ejercicio, Historial y Ajustes. Alex compiló el APK BLE actualizado; falta instalarlo y verificar BLE con el teléfono y ESP32 físicos.
+Cuatro destinos: Inicio, Ejercicio, Historial y Ajustes. El 24-11 Alex verificó la versión con telemetría: análisis limpio, **8 pruebas aprobadas** y APK debug compilado. Falta instalarlo y verificar BLE con el teléfono y ESP32 físicos.
 
 ## Uso
 
@@ -52,6 +52,7 @@ Estado de la integración BLE 0.3:
 - `dart analyze` aprobó modelos, parser y pruebas del protocolo.
 - El primer intento con dependencias recientes exigió Android SDK 37. Se fijaron `flutter_reactive_ble 5.5.0`, `permission_handler 12.0.3` y módulos BLE transitivos 5.5.0; Alex repitió la suite y compiló el APK con SDK 36.
 - Alex repitió `flutter analyze`, `flutter test` y `flutter build apk --debug`: análisis limpio, **7 pruebas aprobadas** y APK generado. La instalación falló únicamente porque ADB no detectó un teléfono; BLE físico sigue pendiente.
+- Tras integrar telemetría y `RESET`, Alex repitió la cadena el 24-11: análisis limpio, **8 pruebas aprobadas** y `app-debug.apk` generado en 21,1 s. Las advertencias de KGP y XML del SDK no bloquearon el build. La instalación y prueba BLE siguen pendientes porque el teléfono aún no se conectó.
 
 Contrato del ESP32 integrado: anunciar el servicio y características definidos en `lib/data/handsense_protocol.dart`, notificar eventos `HS1,E,<secuencia>,<código>`, telemetría `HS1,T,<flex%>,<contacto%>,<estado>` y confirmar `PING` y `RESET`. Los porcentajes se rotulan como relativos, no como unidades físicas.
 

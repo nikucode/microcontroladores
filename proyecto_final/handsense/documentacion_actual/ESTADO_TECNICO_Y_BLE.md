@@ -22,6 +22,11 @@ flexión/contacto relativos y estado en vivo. **Todavía no se ha compilado ni
 probado en XIAO**, por lo que sigue clasificado como implementado sin validar.
 El buzzer está deshabilitado hasta identificar su tipo y corriente.
 
+**Verificación Flutter 24-11:** Alex ejecutó `flutter analyze`, `flutter test` y
+`flutter build apk --debug` después de integrar telemetría: análisis sin
+problemas, 8 pruebas aprobadas y APK debug construido. El teléfono todavía no
+se conectó; instalación, permisos, BLE y recorrido manual permanecen pendientes.
+
 ## Fuente principal: protocolo BLE preparado por Codex
 **Diagnóstico BLE**:
 - Nombre anunciado: `HandSense-BLE-Lab` (solo si la versión local coincide).
