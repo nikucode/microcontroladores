@@ -1,0 +1,6 @@
+Validación de compilación - 26/11/2026
+Placa: esp32:esp32:XIAO_ESP32C3
+xiao_candidato: OK - Flash 640211 bytes - RAM 18412 bytes
+calibracion_banco: OK - Flash 290938 bytes - RAM 13748 bytes
+actuadores_banco: OK - Flash 275016 bytes - RAM 13384 bytes
+Validación física: pendiente

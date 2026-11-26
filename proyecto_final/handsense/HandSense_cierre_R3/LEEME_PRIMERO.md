@@ -1,0 +1,13 @@
+# HandSense — cierre 26/11/2026 (R3)
+
+Paquete de trabajo generado desde el respaldo actual, la rúbrica, el ODS original, el informe histórico y la referencia de afiche de Cote. No sustituye automáticamente el repositorio ni la versión instalada. Se conservan nombres y sede a partir de los documentos recibidos: confirmar NRC, docente, ortografía de integrantes y datos finales.
+
+1. Leer AUDITORIA.md: hallazgos y matriz de rúbrica.
+2. Abrir informe/informe.pdf (21 páginas). Editar informe/informe.tex; compilar desde esa carpeta con `xelatex -interaction=nonstopmode -halt-on-error informe.tex` tres veces. Carlito sustituye a Calibri cuando no está disponible; si tienes Calibri instalada, puedes cambiar la línea `\setmainfont{Carlito}` por `\setmainfont{Calibri}`. Conservar la carpeta figuras y el PDF en ../gantt. Actualizar mediciones, costos, URL de vídeo, referencias, anexos y conclusiones.
+3. Revisar afiche/Afiche_HandSense_77x55.pdf y Vista_previa.png. PDF vectorial de 770 x 550 mm, no una imagen ampliada de la captura de Cote. El SVG es editable. Actualizar resultados.json y ejecutar `python generar_afiche.py` en entorno con Pillow y CairoSVG, o editar el SVG y exportar PDF manteniendo dimensiones. Revisar que los nuevos valores no desborden. No imprimir hasta completar mediciones o decidir expresamente declarar pendientes. Impresión al 100%, sin ajustar a página; pliegues 192,5 y 577,5 mm desde borde izquierdo; zona inferior central 100 mm libre. Comprobar lectura a 1,5 m; algunos rótulos secundarios se redujeron a 30–38 pt para caber y requieren aprobación de legibilidad.
+4. Gantt: ODS original intacto, comparación PDF de dos páginas A3, XLSX editable con semanas calculadas por fechas, CSV originales y actualizados. Fechas de cierre pendientes son ventanas propuestas, no ejecución documentada.
+5. Cuando tengas el hardware, seguir PRUEBAS_HOY.md. Usar primero el diagnóstico, no alterar el firmware integrado actual. Candidato separado, 17 grupos de tests de lógica aprobados, no compilado para XIAO aquí.
+6. Completar mediciones_26nov.csv, ensayos_26nov.csv y costos BOM_original.csv. No inventar cifras. Los valores reales de serial, el multímetro y las pruebas deben corresponder al mismo montaje.
+7. Publicación: seguir PUBLICAR_GITHUB.md una vez aprobados los cambios. No subir el respaldo comprimido entero, materiales privados, videos identificables sin permiso, archivos del navegador guardados ni documentos oficiales de clases sin autorización.
+
+No hay acceso al computador ni al microcontrolador desde este entorno. No se modificó ni se publicó el repositorio real. El informe y el afiche son borradores avanzados, no documentos cerrados con mediciones ficticias.

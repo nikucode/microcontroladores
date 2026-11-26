@@ -26,6 +26,7 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
   String? _pendingCommandName;
   String? _deviceId;
   bool _disposed = false;
+  bool _cancelRequested = false;
 
   HandSenseConnectionState _state = const HandSenseConnectionState(
     DeviceConnectionPhase.idle,
@@ -79,6 +80,7 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
   @override
   Future<void> connect() async {
     await disconnect(announce: false);
+    _cancelRequested = false;
     try {
       if (!await _requestPermissions()) {
         _setState(
@@ -88,9 +90,10 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
         return;
       }
       if (_ble.status != BleStatus.ready) {
+        final technicalStatus = _ble.status.name;
         _setState(
           DeviceConnectionPhase.error,
-          'Bluetooth no está listo (${_ble.status.name}). Revisa que esté encendido.',
+          'Bluetooth todavía no está disponible. Comprueba que esté encendido y concede el permiso de dispositivos cercanos. Estado técnico: $technicalStatus.',
         );
         return;
       }
@@ -128,12 +131,19 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
     } on TimeoutException {
       await _scanSubscription?.cancel();
       _scanSubscription = null;
-      _setState(
-        DeviceConnectionPhase.error,
-        'No se encontró HandSense. Verifica que el ESP32 esté encendido y anunciando BLE.',
-      );
+      if (!_cancelRequested) {
+        _setState(
+          DeviceConnectionPhase.error,
+          'No se encontró HandSense. Verifica que el ESP32 esté encendido y anunciando BLE.',
+        );
+      }
     } catch (error) {
-      _setState(DeviceConnectionPhase.error, 'No fue posible conectar: $error');
+      if (!_cancelRequested) {
+        _setState(
+          DeviceConnectionPhase.error,
+          'No fue posible conectar: $error',
+        );
+      }
     }
   }
 
@@ -237,7 +247,12 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
 
   @override
   Future<bool> resetDeviceSession() async {
-    final acknowledged = await _sendCommand('RESET');
+    // RESET es idempotente: si el ACK se pierde, un unico reintento deja la
+    // sesion igualmente reiniciada sin duplicar intentos ni mediciones.
+    var acknowledged = await _sendCommand('RESET');
+    if (!acknowledged && _state.connected) {
+      acknowledged = await _sendCommand('RESET');
+    }
     if (acknowledged) _seenSequences.clear();
     return acknowledged;
   }
@@ -275,6 +290,7 @@ class BleAttemptSource implements AttemptSource, DeviceControls {
 
   @override
   Future<void> disconnect({bool announce = true}) async {
+    _cancelRequested = true;
     await _scanSubscription?.cancel();
     await _eventSubscription?.cancel();
     await _connectionSubscription?.cancel();

@@ -1,0 +1,7 @@
+fecha,autor,version_firmware,montaje,sensor,estado,repeticion,raw_prom,raw_min,raw_max,mV_ADC,mV_multimetro,error_absoluto_mV,error_relativo_pct,observacion
+2026-11-26,,,,flex,REPOSO,1,,,,,,,,
+2026-11-26,,,,flex,FLEXION_SIN_CONTACTO,1,,,,,,,,
+2026-11-26,,,,flex,PINZA,1,,,,,,,,
+2026-11-26,,,,FSR,REPOSO,1,,,,,,,,
+2026-11-26,,,,FSR,CONTACTO_AISLADO,1,,,,,,,,
+2026-11-26,,,,FSR,PINZA,1,,,,,,,,

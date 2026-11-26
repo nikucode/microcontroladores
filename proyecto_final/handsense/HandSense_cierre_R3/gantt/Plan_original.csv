@@ -1,0 +1,25 @@
+Actividad,Responsable,Avance registrado en septiembre,Inicio previsto,Fin previsto
+Planeación y cierre de propuesta,Ambos,75%,2026-09-09,2026-09-18
+"Definir problema, alcance y requisitos",Ambos,100%,2026-09-09,2026-09-10
+Investigar estado del arte y referentes,Alex,100%,2026-09-09,2026-09-14
+Definir arquitectura y módulos del sistema,Ambos,90%,2026-09-11,2026-09-16
+"Completar mapa mental, esquema físico y descripción",María José,65%,2026-09-16,2026-09-17
+"Cerrar documento, diagrama de bloques y carta Gantt",Alex,45%,2026-09-16,2026-09-18
+Diseño electrónico y caracterización de sensores,Ambos,0%,2026-09-19,2026-10-06
+Seleccionar flex sensor y FSR definitivos,Ambos,0%,2026-09-19,2026-09-22
+Diseñar acondicionamiento y entradas ADC,Alex,0%,2026-09-20,2026-09-24
+Prototipar lectura del flex sensor,Alex,0%,2026-09-23,2026-09-29
+Prototipar lectura del sensor FSR,María José,0%,2026-09-23,2026-09-29
+Calibrar y evaluar repetibilidad de sensores,Ambos,0%,2026-09-30,2026-10-06
+"Firmware, memoria y comunicación",Ambos,0%,2026-10-07,2026-10-20
+Programar adquisición y normalización,Alex,0%,2026-10-07,2026-10-10
+Implementar memoria no volátil,Alex,0%,2026-10-09,2026-10-12
+Implementar LED y motor vibrador,María José,0%,2026-10-10,2026-10-14
+Implementar comunicación Wi-Fi / BLE,María José,0%,2026-10-13,2026-10-17
+Construir dashboard de visualización,María José,0%,2026-10-15,2026-10-20
+"Integración, validación y entrega",Ambos,0%,2026-10-21,2026-11-03
+Integrar hardware completo,Ambos,0%,2026-10-21,2026-10-24
+"Integrar firmware, memoria y dashboard",Ambos,0%,2026-10-23,2026-10-27
+Realizar pruebas funcionales del sistema,Ambos,0%,2026-10-27,2026-10-29
+Validar repetibilidad y funcionamiento,Ambos,0%,2026-10-28,2026-10-31
+Analizar resultados y preparar entrega final,Ambos,0%,2026-10-31,2026-11-03

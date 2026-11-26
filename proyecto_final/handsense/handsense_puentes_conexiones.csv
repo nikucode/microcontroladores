@@ -1,0 +1,13 @@
+﻿cable,origen,destino,red,observaciones
+W01,J12,R+,VCC_3V3,Alimenta riel desde pin 3V3 U1 H12
+W02,J11,R-,GND,Masa desde U1 H11
+W03,R+,A23,VCC_3V3,Alimenta R1
+W04,R-,F26,GND,Retorno FLEX
+W05,B11,H23,FLEX_ADC,D1/GPIO3 a nodo FLEX
+W06,R+,F31,VCC_3V3,Alimenta FSR
+W07,A34,R-,GND,Retorno R2
+W08,B12,H34,FSR_ADC,D2/GPIO4 a nodo FSR
+W09,B14,A41,LED_VERDE_OUT,D4/GPIO6 a R3
+W10,H42,R-,GND,Catodo LED verde
+W11,B15,A48,LED_AMBAR_OUT,D5/GPIO7 a R4
+W12,H49,R-,GND,Catodo LED ambar

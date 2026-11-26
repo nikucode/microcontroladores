@@ -39,6 +39,7 @@ dependencies:
   # API usada por HandSense y son compatibles con el SDK 35/36 instalado.
   flutter_reactive_ble: 5.5.0
   permission_handler: 12.0.3
+  shared_preferences: 2.5.6
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/handsense/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

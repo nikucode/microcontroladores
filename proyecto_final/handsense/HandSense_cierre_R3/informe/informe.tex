@@ -1,0 +1,246 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[spanish,es-tabla,es-noquoting]{babel}
+\usepackage{fontspec}
+\setmainfont{Carlito} % Reemplazar por Calibri si se dispone de la fuente licenciada.
+\usepackage[letterpaper,top=3cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
+\usepackage{xurl}\usepackage{graphicx,booktabs,tabularx,longtable,array,amsmath,siunitx,xcolor,tikz,caption,titlesec,indentfirst,pdfpages,enumitem,hyperref,fancyhdr}
+\usetikzlibrary{positioning,arrows.meta,babel}
+\graphicspath{{figuras/}}
+\definecolor{hs}{HTML}{53448F}\definecolor{muted}{HTML}{4F4866}
+\hypersetup{colorlinks=true,linkcolor=hs,urlcolor=hs,citecolor=hs,pdftitle={HandSense — Informe de proyecto final}}
+\titleformat{\section}{\bfseries\fontsize{14}{17}\selectfont}{\thesection.}{0.5em}{\MakeUppercase}
+\titleformat{\subsection}{\bfseries\fontsize{12}{14}\selectfont}{\thesubsection.}{0.5em}{}
+\titleformat{\subsubsection}{\bfseries\fontsize{12}{14}\selectfont}{\thesubsubsection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{12pt}{12pt}\titlespacing*{\subsection}{0pt}{12pt}{12pt}\titlespacing*{\subsubsection}{0pt}{12pt}{12pt}
+\renewcommand{\thesection}{\Roman{section}}
+\setlength{\emergencystretch}{3em}\setlength{\parindent}{1em}\setlength{\parskip}{6pt}\linespread{1}
+\captionsetup{font={small},labelfont=bf,justification=centering}
+\setlist{nosep,leftmargin=*}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\tabsmall}{\fontsize{10}{12}\selectfont}
+\newcommand{\pend}{\textit{Pendiente de ensayo}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\small Facultad de Ingeniería · Microcontroladores}\fancyhead[R]{\small HandSense}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0.3pt}\setlength{\headheight}{15pt}
+\begin{document}
+\begin{titlepage}\centering
+\includegraphics[width=9cm]{unab.png}\par\vspace{0.8cm}
+Facultad de Ingeniería\\ Escuela de Informática\\ Ingeniería en Automatización y Robótica\par
+\vfill
+{\fontsize{25}{30}\selectfont\bfseries\color{hs} HandSense\par}
+\vspace{0.4cm}{\Large\bfseries Prototipo experimental de reconocimiento de pinza pulgar--índice mediante fusión de sensores\par}
+\vspace{0.5cm}{\large Movimiento con sentido\par}
+\vfill
+\begin{flushleft}Asignatura: Microcontroladores\\ NRC: \textbf{[confirmar]}\\ Académico: \textbf{[confirmar]}\\ Integrantes: Alex Díaz Canales y María José Córdova\\ Fecha de entrega: 27 de noviembre de 2026\end{flushleft}
+\vfill Universidad Andrés Bello\\ Sede Antonio Varas -- Chile\\ Semestre 2026-20\par
+\vspace{0.5cm}\small Versión de trabajo al 26/11/2026. Completar datos de portada y resultados físicos antes de entregar.
+\end{titlepage}
+\setcounter{page}{2}
+\setcounter{tocdepth}{2}\tableofcontents\clearpage\listoffigures\clearpage\listoftables\clearpage
+\section*{Resumen}\addcontentsline{toc}{section}{Resumen}
+HandSense aborda el problema de distinguir una pinza pulgar--índice completa de una flexión aislada o de un contacto fuera de secuencia. Se desarrolló una prueba de concepto electrónica que combina un sensor resistivo flexivo y un sensor de fuerza resistivo (FSR), acondicionados mediante divisores de tensión y procesados por un XIAO ESP32-C3. El firmware adquiere dos canales ADC de 12 bits, calcula una media móvil, normaliza respecto de referencias individuales, aplica histéresis y clasifica la secuencia mediante una máquina de estados. La aplicación móvil Flutter presenta la guía de mano derecha, los resultados y la procedencia real o simulada, y utiliza BLE GATT para recibir estados y enviar comandos PING y RESET. La calibración por monitor serie guarda referencias en memoria no volátil NVS.
+
+La revisión del respaldo local del 26 de noviembre confirmó la implementación de estos módulos. Se ejecutaron 14 grupos de pruebas de lógica C++ con advertencias estrictas y sanitizadores, todos aprobados. Se dispone de evidencia audiovisual de confirmaciones BLE y de un estado no evaluable reportado por la aplicación. Se identificaron brechas entre la simulación y el prototipo: el reposo de un FSR puede coincidir con el extremo inferior del ADC, la saturación y la calibración requieren mediciones y el buzzer permanece deshabilitado hasta identificar su carga. Se preparó una variante candidata con tres grupos adicionales de pruebas aprobados; su compilación objetivo y funcionamiento físico siguen pendientes. No se dispone todavía de resultados físicos etiquetados que permitan cuantificar la mejora del conteo ni la exactitud de los sensores. El alcance es experimental y no clínico.
+\clearpage
+\section{Introducción}
+\subsection{Formulación del problema y antecedentes}
+Una flexión aislada del índice no basta para establecer si el pulgar y el índice hicieron contacto, liberaron dicho contacto y regresaron al reposo. En una tarea de pinza voluntaria, la distinción entre esas etapas permite estudiar un recuento más interpretable que el basado exclusivamente en la amplitud de una señal. El usuario previsto es una persona capaz de ejecutar el gesto bajo supervisión o un estudiante que desea comprender la instrumentación de movimientos. No se presume necesidad médica individual ni eficacia terapéutica.
+
+En un estudio piloto de ejercicios de extremidad superior con sensores corporales, la exactitud media del conteo aumentó del 85,1\% con un sensor situado en la mano al 95,6\% utilizando tres sensores \cite{pilot}. Los dispositivos, movimientos, participantes y métodos son distintos de HandSense: esta cifra sustenta la hipótesis de complementariedad de señales, no una predicción de exactitud para nuestro prototipo. Como alternativa de mercado, MusicGlove utiliza movimientos de pinza en una actividad interactiva \cite{musicglove}; GripAble combina instrumentación física con tareas digitales \cite{gripable}. La contribución propuesta no es la invención del primer dispositivo de mano, sino la comparación experimental de dos detectores sobre el mismo gesto y la explicación de su resultado.
+\subsection{Propuesta de solución tecnológica}
+El sistema instrumenta el dorso del índice con un flexivo y el punto de contacto con un FSR. Se propone comenzar con un blanco plano si la geometría del sensor sobre el pulgar altera las mediciones. Los dos divisores convierten resistencia en tensión; los canales ADC alimentan el procesamiento y los indicadores luminosos. La aplicación es una interfaz del detector: no debe inventar una clasificación física que no recibió. La Fig.~\ref{fig:arch} representa la arquitectura del código recuperado y su alimentación de banco prevista.
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[node distance=6mm and 9mm, every node/.style={font=\small,align=center}, b/.style={draw=hs,rounded corners=2pt,fill=hs!7,minimum height=9mm,text width=34mm}, ar/.style={-{Stealth},thick,draw=hs}]
+\node[b] (flex) {Flexivo + divisor\\D1 / GPIO3};
+\node[b,right=of flex] (fsr) {FSR + divisor\\D2 / GPIO4};
+\node[b,below=of flex,xshift=21.5mm,text width=55mm] (adc) {ADC1 · 12 bits · 11 dB};
+\node[b,below=of adc,text width=55mm] (filter) {Media móvil + normalización};
+\node[b,right=of filter,text width=22mm] (nvs) {NVS\\Referencias};
+\node[b,below=of filter,text width=55mm] (logic) {Detectores: flexión y fusión};
+\node[b,below left=of logic,xshift=12mm,text width=28mm] (led) {LED verde / ámbar};
+\node[b,below right=of logic,xshift=-12mm,text width=28mm] (ble) {BLE GATT\\HS1};
+\node[b,below=of ble,text width=28mm] (app) {App Flutter};
+\draw[ar] (flex.south) |- (adc.west);\draw[ar] (fsr.south) |- (adc.east);\draw[ar] (adc)--(filter);\draw[ar,<->] (filter)--(nvs);\draw[ar] (filter)--(logic);\draw[ar] (logic)--(led);\draw[ar,<->] (logic)--(ble);\draw[ar,<->] (ble)--(app);
+\node[font=\small,below=of led,text width=40mm] {USB 5 V a placa; sensores a 3,3 V; masa común};
+\end{tikzpicture}
+\caption{Arquitectura funcional de referencia (elaboración propia; montaje pendiente de verificación).}\label{fig:arch}
+\end{figure}
+\subsection{Objetivos}
+\subsubsection{Objetivo general}
+Desarrollar y evaluar un prototipo electrónico que reconozca la secuencia de pinza pulgar--índice mediante dos señales analógicas y comunique su resultado a una aplicación móvil.
+\subsubsection{Objetivos específicos}
+\begin{enumerate}
+\item Caracterizar eléctricamente los dos sensores y sus divisores de tensión, contrastando la lectura ADC con un multímetro.
+\item Configurar la adquisición, filtrado, normalización, calibración y memoria no volátil.
+\item Implementar una máquina de estados y comparar la detección por flexión sola y por fusión en ensayos etiquetados independientes.
+\item Integrar realimentación luminosa y comunicación BLE bidireccional con una interfaz accesible.
+\item Documentar la planificación, el montaje, los resultados y las limitaciones del prototipo.
+\end{enumerate}
+\subsection{Alcances y limitaciones}
+Se limita a una tarea de mano derecha con referencias individuales. No mide ángulo articular ni fuerza absoluta; el FSR es sensible a la geometría y al área de aplicación \cite{fsr}. No es un dispositivo médico. La evaluación de usuarios, la autonomía con batería y la validación clínica están fuera del alcance. El firmware de banco y la variante candidata no se consideran integrados hasta superar pruebas objetivo y físicas. El TRL se discute en el Anexo C.
+\section{Metodología}
+\subsection{Recursos utilizados}
+Participan Alex Díaz Canales (software, integración y documentación) y María José Córdova (materiales, montaje y pruebas), con responsabilidad compartida de validación y presentación. Recursos tecnológicos: Arduino CLI 1.6.0, Arduino-ESP32 3.3.12 (versiones reportadas), Wokwi, C++17, Flutter, Git, Figma, aplicación móvil y multímetro. Materiales: XIAO ESP32-C3, flexivo, FSR, resistencias, dos LEDs, cables, protoboard y fuente USB. El buzzer y la batería son elementos condicionados a identificación y prueba. Los costos se registran en la Tabla~\ref{tab:bom}.
+\subsection{Métodos matemáticos, estadísticos y algoritmos}
+\subsubsection{Acondicionamiento resistivo}
+El circuito propuesto emplea un divisor por sensor y masa común. Para el flexivo situado en la rama inferior, con resistencia fija de \SI{47}{\kilo\ohm}, y para el FSR situado en la rama superior, con resistencia fija de \SI{10}{\kilo\ohm}, las tensiones ideales son
+\begin{equation}V_F=V_{CC}\frac{R_F}{47000+R_F},\end{equation}
+\begin{equation}V_C=V_{CC}\frac{10000}{R_C+10000}.\end{equation}
+La tensión nominal es \SI{3.3}{\volt}. Las ecuaciones expresan un modelo ideal, no mediciones. En el FSR la tensión tiende a cero cuando la resistencia es muy alta y se acerca a la alimentación al bajar la resistencia. El rango útil aproximado del ADC del ESP32-C3 con 11 dB es 0--2500 mV \cite{adc}, por lo que un divisor alimentado a 3,3 V puede saturar aun sin superar la alimentación. Si se excede el rango, se debe redimensionar tras medir el sensor; no elevar el umbral por software para ocultar saturación.
+
+La estimación de resistencia a partir del voltaje medido, lejos de los extremos, puede calcularse mediante
+\begin{equation}R_F=47000\frac{V_F}{V_{CC}-V_F},\quad R_C=10000\left(\frac{V_{CC}}{V_C}-1\right).\end{equation}
+No se utiliza para inferir fuerza absoluta sin una referencia mecánica y calibración específica. Se propone medir las resistencias fijas reales con multímetro sin alimentación.
+\subsubsection{Conversión A/D y filtrado}
+El código configura 12 bits con \texttt{analogReadResolution(12)} y atenuación de 11 dB con \texttt{analogSetPinAttenuation} sobre GPIO3 y GPIO4. Las lecturas digitales tienen 4096 códigos (0 a 4095). La función \texttt{analogReadMilliVolts()} proporciona una lectura calibrada en mV según la API de Arduino-ESP32 \cite{adc}; es una conversión separada de la lectura cruda. No se utiliza la expresión $3,3N/4095$ como medición calibrada. En el curso se configuraron ADCON0 y ADCON1 del PIC; el ESP32-C3 tiene una arquitectura distinta y aquí la configuración se realiza por la API del fabricante, no mediante escritura directa de registros. Debe confirmarse con el docente que este nivel de configuración satisface la rúbrica para la placa autorizada.
+
+El intervalo nominal de adquisición es $T_s=20$ ms, equivalente a 50 muestras/s en ausencia de retrasos. El filtro usa una media móvil de cinco valores; con cinco muestras completas:
+\begin{equation}\bar{x}[k]=\frac{1}{5}\sum_{i=0}^{4}x[k-i].\end{equation}
+En el firmware recuperado se filtran valores ya normalizados cuando la calibración es válida. Durante el llenado se utiliza el número de muestras disponibles. El retardo del filtro puede alterar el orden detectado; se evaluará con movimientos físicos.
+\subsubsection{Calibración y normalización}
+Se capturan 50 muestras por postura (reposo y pinza), nominalmente un segundo por postura, y se calculan sus medias y extremos. La separación mínima es de 200 cuentas y la variación pico a pico de cada postura no debe superar un cuarto de la separación. Estos son criterios de ingeniería iniciales, no límites fisiológicos. Para una lectura $n$ y referencias $r,p$:
+\begin{equation}q=\operatorname{clip}_{[0,4095]}\left(4095\frac{n-r}{p-r}\right).\end{equation}
+El firmware usa aritmética entera y admite polaridad creciente o decreciente. La actividad relativa es $100q/4095$, redondeada para la telemetría. Los umbrales de activación y desactivación son 2457 y 1433 cuentas normalizadas (aproximadamente 60\% y 35\%). La histéresis evita conmutaciones rápidas próximas a un umbral único. La calibración persiste cuatro referencias, versión y checksum FNV-1a en NVS \cite{nvs}; la escritura se comprueba por tamaño y relectura.
+\subsubsection{Reconocimiento secuencial}
+Se exige reposo inicial, flexión sola, contacto manteniendo flexión, liberación del contacto manteniendo flexión y retorno al reposo. Contacto primero o simultáneo al inicio no se acepta como completo. El tiempo máximo es 5000 ms desde inicio; el límite se evalúa antes de aceptar la transición. Una pérdida prematura de flexión invalida la secuencia. Después de un timeout se espera reposo antes de admitir otro intento. La Fig.~\ref{fig:fsm} resume los estados válidos.
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[node distance=4mm,every node/.style={font=\small},b/.style={draw=hs,fill=hs!7,rounded corners=2pt,minimum height=8mm,minimum width=23mm},ar/.style={-{Stealth},thick,draw=hs}]
+\node[b](r){Reposo};\node[b,right=of r](f){Flexión};\node[b,right=of f](c){Contacto};\node[b,right=of c](l){Liberación};\node[b,right=of l](rr){Reposo};
+\draw[ar](r)--(f);\draw[ar](f)--(c);\draw[ar](c)--(l);\draw[ar](l)--(rr);
+\node[b,below=12mm of c,minimum width=48mm](w){Espera de reposo};\draw[ar](c)--node[right]{\scriptsize timeout}(w);\draw[ar](w.west)-| (r.south);\node[below=3mm of rr,font=\scriptsize]{+1 completa};
+\end{tikzpicture}
+\caption{Camino válido y recuperación por timeout (elaboración propia; esquema simplificado).}\label{fig:fsm}
+\end{figure}
+El detector de referencia cuenta un ciclo de flexión mediante su propio latch. El firmware registra ambos conteos por serie; la aplicación deriva su comparación a partir de ciertos tipos de evento, lo que no garantiza equivalencia en todos los casos. Por tanto, los ensayos científicos utilizarán los contadores del firmware y las etiquetas manuales, no únicamente la comparación visual de la app.
+\subsubsection{Evaluación y error}
+Se compararán lecturas estabilizadas en mV con el multímetro sobre el mismo nodo y postura. Para medición $V_a$ y referencia $V_m$:
+\begin{equation}e_a=|V_a-V_m|,\quad e_r=100\frac{|V_a-V_m|}{|V_m|}.\end{equation}
+Si la referencia es cero o cercana a la resolución instrumental, se informa error absoluto y el relativo queda no aplicable. Registrar modelo, resolución, condiciones y cantidad de muestras. Se propone realizar diez ensayos nuevos por clase (pinza completa, flexión sola, contacto aislado y falta de liberación), después de fijar las referencias. Si se obtienen menos, se informa el tamaño real. Se utiliza etiqueta manual independiente, se calculan verdaderos/falsos positivos y negativos de ambos métodos sobre los mismos intentos, y se informa abstención separadamente. No se excluyen silenciosamente los casos no evaluables.
+\subsection{Criterios de diseño}
+Se prioriza adquisición segura a 3,3 V, bajo número de componentes, montaje reparable, señal estable y separación entre demostración y dispositivo. Se evita alimentar cargas desconocidas desde GPIO. El montaje inicial se realiza con USB, batería desconectada hasta confirmar compatibilidad. Para la interfaz se consideran contraste y objetivos táctiles de WCAG 2.2 \cite{wcag} como orientación de accesibilidad, sin declarar conformidad total. Para comunicación se utiliza BLE GATT y el protocolo de aplicación HS1. No se alegan certificaciones médicas ni industriales.
+\subsection{Plan de trabajo}
+La carta original del 16/09 preveía comenzar el 09/09 y cerrar el 03/11. El ODS recuperado conserva porcentajes declarados en esa fecha y no debe reinterpretarse como progreso actual. Los hitos documentados posteriores reflejan la transición Wokwi--XIAO y HTTP--BLE. La carta comparativa del Anexo B conserva los plazos originales y registra el estado al 26/11, incluida la feria oficial del 27/11, 09:00--13:00 \cite{rubrica}. Las ventanas actualizadas no son horas reales de dedicación.
+\section{Desarrollo del proyecto}
+\subsection{Selección de equipamiento}
+\begin{table}[htbp]\centering\tabsmall\caption{Instrumentación y asignación de señales.}\label{tab:inst}
+\begin{tabularx}{\linewidth}{@{}l l Y Y@{}}\toprule Elemento & Pin & Función & Estado \\\midrule
+XIAO ESP32-C3 & USB & ADC1, lógica y BLE & Placa identificada; pinout \cite{xiao}\\
+Flexivo & D1/GPIO3 & Resistencia según curvatura & Modelo exacto por confirmar\\
+FSR & D2/GPIO4 & Contacto relativo & Modelo y respuesta pendientes\\
+LED verde & D4/GPIO6 & Pulso intento completo & Implementado; prueba física pendiente\\
+LED ámbar & D5/GPIO7 & Pulso intento incompleto & Implementado; prueba física pendiente\\
+Buzzer & D3/GPIO5 & Salida sonora opcional & Deshabilitado hasta identificar tipo y corriente\\
+Multímetro & -- & Referencia de tensión/resistencia & Modelo y resolución por registrar\\\bottomrule\end{tabularx}
+\end{table}
+Se seleccionó el XIAO por su tamaño, entradas ADC y BLE integrado; el Wokwi histórico usa un ESP32 DevKit y pines diferentes. El uso de LEDs como dos salidas de realimentación se debe verificar con la interpretación de ``dos actuadores'' del docente. La propuesta inicial de motor vibrador se conserva como antecedente; no está habilitada en el firmware actual.
+\subsection{Diseño de la solución}
+\subsubsection{Circuito y montaje}
+La Fig.~\ref{fig:circuit} muestra las redes previstas, verificadas contra las constantes GPIO del respaldo, pero aún no contra el cableado final. Cada LED incorpora una resistencia serie de \SI{330}{\ohm} prevista. El GPIO no alimenta directamente un motor. En caso de incorporar un buzzer que exceda la capacidad de salida, es necesaria una etapa de control dimensionada según su hoja de datos. No se conecta la batería LiPo sin verificar protección, polaridad y corriente de carga admisible.
+\begin{figure}[htbp]\centering
+\begin{tikzpicture}[scale=.9,every node/.style={font=\small},res/.style={draw,minimum width=9mm,minimum height=5mm,fill=hs!6}]
+\foreach \x/\top/\bottom/\pin in {0/{47 k$\Omega$}/{Flexivo}/{D1 / GPIO3},4.8/{FSR}/{10 k$\Omega$}/{D2 / GPIO4}} {
+\node at (\x,3.8){3,3 V};\node[res] (a) at (\x,2.8){\top};\node[res] (b) at (\x,0.8){\bottom};
+\draw (\x,3.55)--(a.north);\draw (a.south)--(b.north);\fill (\x,1.8) circle (2pt);\draw (\x,1.8)--(\x+1.1,1.8) node[right]{\pin};\draw (b.south)--(\x,0.1) node[below]{GND};}
+\end{tikzpicture}
+\caption{Divisores resistivos propuestos (elaboración propia).}\label{fig:circuit}
+\end{figure}
+\subsubsection{Organización del código y protocolo}
+\begin{table}[htbp]\centering\tabsmall\caption{Correspondencia entre módulos de software y bloques.}\label{tab:modules}
+\begin{tabularx}{\linewidth}{@{}l Y@{}}\toprule Archivo & Responsabilidad \\\midrule
+\texttt{xiao\_integrado.ino} & ADC, captura, NVS, filtro, salidas, BLE y monitor serie.\\
+\texttt{calibration\_logic.h} & Validez, estabilidad, normalización y checksum.\\
+\texttt{gesture\_logic.h} & Latches, contador flexivo, estados y eventos.\\
+\texttt{test\_regressions.cpp} & Pruebas de lógica independientes del SDK.\\
+\texttt{handsense\_protocol.dart} & Parseo de eventos, estados y ACK.\\
+\texttt{ble\_attempt\_source.dart} & Escaneo, conexión, suscripción y envío de comandos.\\
+\texttt{session\_model.dart} & Sesiones, origen, pausa y vigencia de telemetría.\\
+\texttt{screens.dart}, \texttt{app\_theme.dart} & Interfaz, guía y accesibilidad.\\\bottomrule\end{tabularx}\end{table}
+El servicio BLE usa UUID \texttt{6c7a0001-8e2d-4f91-a6b5-3d3f7a120001}; eventos y control sustituyen los primeros ocho dígitos por \texttt{6c7a0002} y \texttt{6c7a0003}. Se emplean notificaciones y escritura con respuesta GATT. Ejemplos: \texttt{HS1,T,60,70,C} indica actividad relativa y estado de contacto; \texttt{HS1,E,1,C} informa un intento completo; \texttt{HS1,C,PING} recibe \texttt{HS1,A,PING,OK}. RESET reinicia sesión sin borrar calibración. Los mensajes de telemetría se envían nominalmente cada 250 ms. Un estado U bloquea la evaluación; el firmware base transmite U como telemetría, no como evento de intento. El ejemplo porcentual es ilustrativo, no un resultado experimental. La app verifica antigüedad de hasta dos segundos y pausa si pierde señal. PING y RESET visibles en vídeo prueban la interfaz de confirmación, pero falta verificar su efecto físico y la secuencia calibrada.
+\subsubsection{Bitácora de desarrollo}
+\begin{longtable}{@{}p{19mm}p{37mm}p{77mm}p{15mm}@{}}\caption{Hitos, dificultades y decisiones.}\label{tab:log}\\\toprule Fecha & Hito & Observación / resolución & Resp.\\\midrule\endfirsthead\toprule Fecha & Hito & Observación / resolución & Resp.\\\midrule\endhead
+09--18/09 & Plan inicial & ODS recuperado; fechas previstas y avances declarados, no ejecución final. & Ambos\\
+28/10 & Especificación & Acotar tarea a una pinza; comparar dos detectores. & Ambos\\
+29--30/10 & Wokwi & Potenciómetros en lugar de sensores; salida serie. & Alex\\
+10/11 & Informe y app & Informe de avances, Flutter inicial; hardware por confirmar. & Alex\\
+20--21/11 & XIAO y BLE & Adaptación de pines; transporte HTTP histórico reemplazado por BLE. & Ambos\\
+24/11 & Firmware & Corrección de timeout, recontacto, NVS y nombres de sketches; compilación objetivo reportada. & Alex\\
+24--25/11 & Montaje y UX & Pruebas de montaje reportadas; problema FSR; diseño y transferencia de ilustraciones. & Ambos\\
+25/11 & Android V4.4.1 & Alto contraste, guía, separación de estados; análisis limpio reportado, tests/build bloqueados en Codex. & Alex\\
+26/11 & Auditoría & 14 grupos repetidos; hallazgo de extremo inferior FSR, RESET previo a ejecución y recuperación de señal. Candidato separado: 17 grupos aprobados. & Equipo / IA\\
+26/11 & Cierre físico & ADC vs multímetro, calibración, LEDs, integración: pendientes de evidencia. & Ambos\\\bottomrule\end{longtable}
+\subsection{Prototipo y simulación}
+La simulación Wokwi emplea potenciómetros para generar entradas controlables y permite comprobar la lógica sin representar con exactitud el comportamiento de los sensores resistivos. En el prototipo real se observan la placa y el montaje de banco de las fotografías de la Fig.~\ref{fig:physical}. La fotografía no acredita continuidad ni funcionamiento completo.
+\begin{figure}[htbp]\centering
+\includegraphics[height=5cm]{xiao_24nov.jpg}\hspace{5mm}\includegraphics[height=5cm]{protoboard_24nov.jpg}
+\caption{Placa y pruebas de montaje del 24/11 (fotografías del equipo).}\label{fig:physical}
+\end{figure}
+\begin{figure}[htbp]\centering
+\includegraphics[height=7.5cm]{app_guia.png}\hfill\includegraphics[height=7.5cm]{app_ble.png}\hfill\includegraphics[height=7.5cm]{app_conectado.png}
+\caption{Capturas de la aplicación Android: guía, diagnóstico y estado de conexión (grabación del equipo, 25/11).}\label{fig:app}
+\end{figure}
+\subsubsection{Resultados disponibles y pendientes}
+\begin{table}[htbp]\centering\tabsmall\caption{Evidencias al corte del 26/11.}\label{tab:ev}
+\begin{tabularx}{\linewidth}{@{}l Y Y@{}}\toprule Prueba & Resultado & Alcance \\\midrule
+Lógica base & 14 grupos aprobados, C++17 ASan/UBSan & Software, no hardware\\
+Candidato & 17 grupos aprobados & Encabezados C++; compilación Arduino pendiente\\
+Compilación base & 639493 B flash, 18396 B RAM estática (reportado 24/11) & No repetida aquí\\
+Android & PING, RESET y U visibles en vídeo & Falta pinza física y latencia medida\\
+ADC, calibración, NVS & \pend & Comparación multímetro y reinicio\\
+Actuadores & \pend & Comprobar LEDs, no habilitar buzzer sin datos\\\bottomrule\end{tabularx}\end{table}
+\begin{table}[htbp]\centering\tabsmall\caption{Registro pendiente de comparación con instrumento de referencia.}\label{tab:measure}
+\begin{tabularx}{\linewidth}{@{}Y r r r r@{}}\toprule Postura & ADC crudo & ADC mV & DMM mV & Error \%\\\midrule Flexivo: reposo & -- & -- & -- & --\\Flexivo: flexión & -- & -- & -- & --\\FSR: reposo & -- & -- & -- & --\\FSR: contacto & -- & -- & -- & --\\\bottomrule\end{tabularx}
+\end{table}
+La revisión encontró que la versión base bloquea el conteo ante extremos ADC sostenidos durante 25 muestras; un FSR descargado puede producir cero legítimamente. La variante candidata permite ese extremo solo si corresponde a una referencia de reposo válida, bloquea ante otros extremos, descarta la secuencia interrumpida sin perder totales y confirma RESET después de ejecutarlo. No puede distinguir un FSR abierto de un reposo eléctricamente equivalente. Requiere compilación y comprobación con el circuito real. Los valores de la Tabla~\ref{tab:measure} deben completarse después del ensayo, junto con la clasificación comparativa y los registros de repetición. No se informa precisión propia sin observaciones.
+
+Vídeo de YouTube del prototipo operativo: \textbf{[insertar enlace tras grabar ensayo físico]}. El vídeo disponible de la aplicación no sustituye el vídeo del sistema físico completo exigido en el formato oficial \cite{formato}.
+\subsection{Evaluación económica del proyecto}
+\begin{table}[htbp]\centering\tabsmall\caption{Inventario y estimación económica pendiente de confirmar.}\label{tab:bom}
+\begin{tabularx}{\linewidth}{@{}Y l Y r@{}}\toprule Recurso & Cant. & Fuente / observación & CLP \\\midrule
+XIAO ESP32-C3 & 1 & AliExpress, informado & --\\
+Flexivo y FSR & 2 & AliExpress, informado & --\\
+LEDs y resistencias & 2 + varias & Comprobar compras y valores & --\\
+Buzzer / driver & 1 previsto & No habilitado & --\\
+Protoboard, cables, soporte & lote & Materiales y reposición & --\\
+Multímetro, herramientas & uso & Prorrateo o préstamo & --\\
+Envíos / impuestos & lote & Comprobantes & --\\
+Mano de obra & horas & Horas y tarifa estimada por acordar & --\\\midrule Total & & No calculable aún & --\\\bottomrule\end{tabularx}\end{table}
+La estimación debe distinguir gasto efectivo y costo imputado de trabajo/instrumentos. Si se dispone de horas $h_i$ y tarifa $t_i$, el costo de mano de obra será $\sum_i h_i t_i$. No se imputan precios ficticios. Se anexa la plantilla BOM original para completar.
+\section{Conclusiones y trabajo futuro}
+Se implementó una arquitectura de dos canales analógicos con procesamiento secuencial y una aplicación que diferencia datos simulados y reales. La prueba de lógica recuperada se reprodujo con 14 grupos aprobados, y la revisión permitió identificar condiciones de bloqueo y recuperación que justifican una variante candidata separada. Las confirmaciones BLE observadas son evidencia parcial de integración. Todavía no se puede concluir que la fusión reduzca los falsos positivos en el montaje real: falta la comparación sobre intentos etiquetados y la validación eléctrica. Los resultados de los objetivos específicos se revisarán con las mediciones antes de cerrar la entrega. Como trabajo futuro se propone mejorar la sujeción, calibración desde la app, persistencia de sesiones, robustez de reconexión y evaluación de repetibilidad con usuarios voluntarios, sin presentar beneficios clínicos no demostrados.
+\clearpage
+\section*{Declaración de uso de inteligencia artificial generativa}\addcontentsline{toc}{section}{Declaración de uso de IA generativa}
+Se utilizaron ChatGPT y Codex para investigación asistida, organización de documentación, desarrollo y revisión de código, pruebas automatizadas y diseño de experiencia; también se emplearon herramientas de diseño asistido (Figma, Lovable y Claude según los registros del proyecto). Las decisiones técnicas, mediciones y revisión final corresponden al equipo. Las pruebas de software se distinguen de las físicas; no se atribuyen a la IA mediciones ni resultados no realizados. El equipo debe verificar esta declaración antes de entregar.
+\clearpage
+\begin{thebibliography}{99}\addcontentsline{toc}{section}{Referencias bibliográficas}
+\bibitem{pilot} ``Automatic Identification of Upper Extremity Rehabilitation Exercise Type and Dose Using Body-Worn Sensors and Machine Learning: A Pilot Study,'' 2021. [En línea]. Disponible: \url{https://pmc.ncbi.nlm.nih.gov/articles/PMC8339513/}. [Accedido: 26-nov-2026].
+\bibitem{musicglove} Flint Rehab, ``MusicGlove Hand Therapy.'' [En línea]. Disponible: \url{https://www.flintrehab.com/product/musicglove-hand-therapy/}.
+\bibitem{gripable} GripAble, sitio de producto. [En línea]. Disponible: \url{https://gripable.co/}.
+\bibitem{fsr} Interlink Electronics, ``FSR Integration Guide.'' [En línea]. Disponible: \url{https://www.interlinkelectronics.com/downloads/integration-guides/fsr-400-series-integration-guide.pdf}.
+\bibitem{adc} Espressif Systems, ``ADC -- Arduino ESP32.'' [En línea]. Disponible: \url{https://docs.espressif.com/projects/arduino-esp32/en/latest/api/adc.html}. [Accedido: 26-nov-2026].
+\bibitem{nvs} Espressif Systems, ``Preferences -- Arduino ESP32.'' [En línea]. Disponible: \url{https://docs.espressif.com/projects/arduino-esp32/en/latest/api/preferences.html}.
+\bibitem{wcag} W3C, ``Web Content Accessibility Guidelines (WCAG) 2.2.'' [En línea]. Disponible: \url{https://www.w3.org/TR/WCAG22/}.
+\bibitem{rubrica} Universidad Andrés Bello, ``Feria de proyectos -- Rúbrica de evaluación,'' Microcontroladores, 27-nov-2026. Documento de asignatura.
+\bibitem{xiao} Seeed Studio, ``Getting Started with Seeed Studio XIAO ESP32C3.'' [En línea]. Disponible: \url{https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/}. [Accedido: 26-nov-2026].
+\bibitem{formato} Universidad Andrés Bello, ``Formato informes proyecto Microcontroladores 2026-20.'' Documento de asignatura.
+\end{thebibliography}
+\clearpage
+\section*{Anexo A. Hojas de especificaciones}\addcontentsline{toc}{section}{Anexo A. Hojas de especificaciones}
+Conservar las hojas de datos correspondientes al modelo real del flexivo y FSR, todavía por identificar. Para la placa, la documentación Seeed \cite{xiao} permite identificar GPIO3 y GPIO4 como entradas ADC1. Para el ADC, la documentación Espressif \cite{adc} respalda configuración de 12 bits y rango aproximado de 0--2500 mV para el C3 a 11 dB. Adjuntar las páginas relevantes de las hojas de datos del sensor y del buzzer una vez identificado; la guía general FSR \cite{fsr} no sustituye la ficha del modelo exacto.
+\clearpage
+\section*{Anexo B. Otros: reproducibilidad y planificación}\addcontentsline{toc}{section}{Anexo B. Otros}
+La versión auditada corresponde al respaldo local del 26/11, con HEAD informado \texttt{62616d3} y modificaciones no registradas. El código base y el candidato se distribuyen en carpetas separadas. Reproducibilidad de las pruebas (desde el directorio firmware):
+\begin{verbatim}
+g++ -std=c++17 -Wall -Wextra -Wpedantic -Wconversion -Werror \\
+  -fsanitize=address,undefined \\
+  xiao_integrado_tests/test_regressions.cpp -o /tmp/hs_tests
+ASAN_OPTIONS=detect_leaks=0 /tmp/hs_tests
+\end{verbatim}
+Para el candidato, sustituir \texttt{xiao\_integrado\_tests} por \texttt{xiao\_candidato\_tests}. Resultados observados: 14 y 17 grupos aprobados respectivamente. LeakSanitizer desactivado; no se ejecutó compilación objetivo nueva ni pruebas Flutter en este entorno. El repositorio público informado es \url{https://github.com/nikucode/microcontroladores/tree/main/proyecto_final/handsense}; la versión local aún no se ha publicado. Los CSV de mediciones y ensayos están vacíos a la fecha de corte. Los códigos completos se adjuntan digitalmente en el paquete; no se incluyen páginas de código extensas en el cuerpo.
+
+La carta Gantt comparativa se incorpora a continuación: planificación original y actualización al 26/11. El archivo ODS original se conserva aparte y el CSV actualizado permite editar ventanas y estados.
+\clearpage
+\begin{center}\includegraphics[page=1,angle=90,width=\textwidth,height=.94\textheight,keepaspectratio]{../gantt/Gantt_comparativo.pdf}\end{center}
+\clearpage
+\begin{center}\includegraphics[page=2,angle=90,width=\textwidth,height=.94\textheight,keepaspectratio]{../gantt/Gantt_comparativo.pdf}\end{center}
+\clearpage
+\section*{Anexo C. Niveles de madurez tecnológica}\addcontentsline{toc}{section}{Anexo C. Niveles de madurez tecnológica}
+La escala TRL distingue concepto, prueba de principio, validación en laboratorio y operación en entornos representativos. HandSense cuenta con prueba de concepto analítica y de software y evidencia parcial de integración electrónica. Se estima prudentemente TRL 3 para la función completa al corte del 26/11; TRL 4 sería una meta condicionada a validar los componentes y el sistema integrado en banco, con mediciones y resultados reproducibles. No corresponde asignar TRL de producto operativo ni inferir una validación clínica. La calificación debe actualizarse con evidencia del ensayo final, no solamente con la existencia del código.
+\end{document}

@@ -1,0 +1,37 @@
+﻿referencia,tipo,valor,terminal,coordenada,red,observaciones
+U1,XIAO ESP32-C3,,D0/GPIO2,D10,SIN_CONEXION,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,5V,H10,SIN_CONEXION,No conectar 5V a los sensores
+U1,XIAO ESP32-C3,,D1/GPIO3,D11,FLEX_ADC,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,GND,H11,GND,No conectar 5V a los sensores
+U1,XIAO ESP32-C3,,D2/GPIO4,D12,FSR_ADC,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,3V3,H12,VCC_3V3,No conectar 5V a los sensores
+U1,XIAO ESP32-C3,,D3/GPIO5,D13,SIN_CONEXION,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,D10/GPIO10,H13,SIN_CONEXION,No conectar 5V a los sensores
+U1,XIAO ESP32-C3,,D4/GPIO6,D14,LED_VERDE_OUT,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,D9/GPIO9,H14,SIN_CONEXION,No conectar 5V a los sensores
+U1,XIAO ESP32-C3,,D5/GPIO7,D15,LED_AMBAR_OUT,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,D8/GPIO8,H15,SIN_CONEXION,No conectar 5V a los sensores
+U1,XIAO ESP32-C3,,D6/GPIO21,D16,SIN_CONEXION,USB-C orientado hacia fila 9
+U1,XIAO ESP32-C3,,D7/GPIO20,H16,SIN_CONEXION,No conectar 5V a los sensores
+RAIL+,riel rojo derecho,3.3 V,alimentacion,R+,VCC_3V3,Confirmar continuidad y cortes del riel
+RAIL-,riel azul derecho,GND,alimentacion,R-,GND,Confirmar continuidad y cortes del riel
+R1,resistencia,47 kOhm nominal,1,E23,VCC_3V3,
+R1,resistencia,47 kOhm nominal,2,F23,FLEX_ADC,
+J_FLEX,conector sensor externo,2 hilos,1,J23,FLEX_ADC,Cable hasta un extremo del sensor flexivo
+J_FLEX,conector sensor externo,2 hilos,2,J26,GND,Cable hasta el otro extremo del sensor flexivo
+FLEX1,sensor flexivo 2.2 pulgadas,variable,1,EXTERNO_FLEX_1,FLEX_ADC,Extremo unido al cable de J23
+FLEX1,sensor flexivo 2.2 pulgadas,variable,2,EXTERNO_FLEX_2,GND,Extremo unido al cable de J26
+J_FSR,conector sensor externo,2 hilos,1,J31,VCC_3V3,Cable hasta un extremo del FSR402
+J_FSR,conector sensor externo,2 hilos,2,J34,FSR_ADC,Cable hasta el otro extremo del FSR402
+FSR1,FSR402,variable,1,EXTERNO_FSR_1,VCC_3V3,Extremo unido a J31
+FSR1,FSR402,variable,2,EXTERNO_FSR_2,FSR_ADC,Extremo unido a J34
+R2,resistencia,10 kOhm nominal,1,E34,GND,
+R2,resistencia,10 kOhm nominal,2,F34,FSR_ADC,
+R3,resistencia,330 Ohm nominal,1,E41,LED_VERDE_OUT,
+R3,resistencia,330 Ohm nominal,2,F41,LED_VERDE_ANODO,
+LED_VERDE,LED,color verde,anodo,J41,LED_VERDE_ANODO,Patilla larga (verificar polaridad)
+LED_VERDE,LED,color verde,catodo,J42,GND,Patilla corta/lado plano (verificar)
+R4,resistencia,330 Ohm nominal,1,E48,LED_AMBAR_OUT,
+R4,resistencia,330 Ohm nominal,2,F48,LED_AMBAR_ANODO,
+LED_AMBAR,LED,color ambar,anodo,J48,LED_AMBAR_ANODO,Patilla larga (verificar polaridad)
+LED_AMBAR,LED,color ambar,catodo,J49,GND,Patilla corta/lado plano (verificar)

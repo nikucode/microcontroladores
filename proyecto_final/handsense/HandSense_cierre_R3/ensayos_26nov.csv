@@ -1,0 +1,6 @@
+fecha,version,montaje,origen,id,clase_manual,flex_solo_incremento,fusion_incremento,clasificacion,LED_verde,LED_ambar,buzzer,app_coincide,observaciones
+2026-11-26,,,real,1,pinza_completa,,,,,,,,
+2026-11-26,,,real,2,flexion_sin_contacto,,,,,,,,
+2026-11-26,,,real,3,contacto_sin_flexion,,,,,,,,
+2026-11-26,,,real,4,contacto_sin_liberacion,,,,,,,,
+2026-11-26,,,real,5,senal_no_evaluable,,,,,,,,

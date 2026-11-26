@@ -10,6 +10,18 @@ g++ -std=c++17 -Wall -Wextra -pedantic test_logic.cpp -o /tmp/handsense_logic_te
 
 Esperado: `9 pruebas de lógica HandSense aprobadas`. Si falla, no cargar el clasificador hasta revisar el caso indicado.
 
+Para el candidato físico XIAO:
+
+```bash
+cd proyecto_final/handsense/firmware/xiao_integrado_tests
+g++ -std=c++17 -Wall -Wextra -Wpedantic -Wconversion -Werror \
+  -fsanitize=address,undefined test_regressions.cpp -o /tmp/handsense-xiao-tests
+ASAN_OPTIONS=detect_leaks=0 /tmp/handsense-xiao-tests
+```
+
+Esperado: `14 grupos de pruebas del firmware físico aprobados`. Las pruebas
+están fuera de la carpeta del sketch para que Arduino no compile su `main()`.
+
 ## Simulaciones históricas Wokwi
 
 - `firmware/adquisicion/`: importar `sketch.ino` y `diagram.json` en un ESP32 DevKit clásico.
@@ -40,7 +52,7 @@ Esperado según la terminal de Alex: análisis limpio, 7 pruebas y `build/app/ou
 
 ## BLE sin sensores
 
-1. Cargar `firmware/ble_diagnostico/sketch.ino` en la placa confirmada.
+1. Cargar `firmware/ble_diagnostico/ble_diagnostico.ino` en la placa confirmada.
 2. Abrir monitor serie a 115200 y buscar `Anunciando HandSense-BLE-Lab`.
 3. En nRF Connect, conectar al servicio UUID documentado, habilitar notificaciones en Eventos y escribir `HS1,C,PING` en Control.
 4. Esperado: notificación `HS1,A,PING,OK` y registro RX/TX serie.

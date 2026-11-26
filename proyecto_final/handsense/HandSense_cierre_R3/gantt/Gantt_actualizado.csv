@@ -1,0 +1,18 @@
+ID,Actividad,Responsable,Inicio ventana,Fin ventana,Estado al 26/11,Evidencia o criterio de cierre
+H1,Definición y propuesta inicial,Ambos,2026-09-09,2026-09-18,Plan original,"ODS; avances registrados en septiembre, no cierre comprobado"
+H2,Investigación y especificación,Alex,2026-10-28,2026-10-28,Documentado,Especificación 28/10
+H3,Adquisición y detector Wokwi,Alex,2026-10-29,2026-10-30,Simulación,Archivos y commits históricos
+H4,Informe de avance y Flutter inicial,Alex,2026-11-10,2026-11-10,Documentado,avance.tex y PDF 10/11
+G1,Inventario y compras,Cote,2026-11-20,2026-11-26,Parcial,BOM sin precios/modelos completos
+G2,Montaje XIAO y esquemas,Cote,2026-11-20,2026-11-26,Parcial,Fotos y propuesta; montaje final no verificado
+G3,"Firmware XIAO, ADC y detector",Alex,2026-11-20,2026-11-24,Software verificado,14 grupos en respaldo; compilación reportada
+G4,"Flutter, BLE y contrato",Alex,2026-11-20,2026-11-25,Implementado,"Código local, APK y capturas reportadas"
+G5,"PING, RESET y estado BLE",Alex,2026-11-24,2026-11-25,Evidencia parcial,Confirmaciones visibles en video
+G6,Diseño Figma y refinamiento UX,Alex,2026-11-24,2026-11-25,Implementado,Assets y pantallas Flutter
+G7,"Diagnóstico, ADC vs DMM, calibración",Ambos,2026-11-26,2026-11-26,Pendiente crítico,Valores reales y NVS tras reinicio
+G8,LEDs / buzzer y seguridad,Cote,2026-11-26,2026-11-26,Pendiente crítico,Buzzer deshabilitado; verificar LEDs
+G9,"Integración, ensayos y reconexión",Ambos,2026-11-26,2026-11-26,Pendiente crítico,Pinza real y comparación
+G10,"Informe, Gantt y afiche",Ambos,2026-11-26,2026-11-26,En revisión,PDF LaTeX y afiche con campos pendientes
+G11,Impresión y montaje de stand,Ambos,2026-11-26,2026-11-26,Pendiente,77×55 cm; prueba de lectura
+G12,"GitHub, vídeo, APK y ensayo",Ambos,2026-11-26,2026-11-26,Pendiente,Publicación selectiva y respaldo
+G13,Feria 09:00–13:00,Ambos,2026-11-27,2026-11-27,Programado,Rúbrica oficial

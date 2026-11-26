@@ -20,8 +20,9 @@ class Attempt {
   String get explanation => switch (outcome) {
     Outcome.complete => 'Se registraron flexión y contacto, seguidos de liberación y regreso a reposo.',
     Outcome.noContact => 'Se registró un ciclo de flexión, pero no contacto. Si sí hubo contacto, revisa el ajuste y la calibración.',
-    Outcome.noFlexion => 'Se registró contacto, pero no suficiente flexión según los límites del ejemplo.',
-    Outcome.noRelease => 'El contacto permaneció activo hasta terminar el tiempo del ejemplo. No se contó una repetición completa.',
+    Outcome.noFlexion =>
+      'Se registró contacto, pero la flexión no alcanzó el rango configurado.',
+    Outcome.noRelease => 'El contacto permaneció activo hasta terminar la ventana del intento. No se contó una repetición completa.',
     Outcome.unreliable => 'La señal del ejemplo no permite interpretar el intento. Esto no significa que el movimiento haya sido incorrecto.',
   };
 }
@@ -57,11 +58,17 @@ class HandSenseConnectionState {
 enum GesturePhase { rest, flexion, contact, release, waitForRest, signalError }
 
 class DeviceTelemetry {
-  const DeviceTelemetry(this.flexionPercent, this.contactPercent, this.phase);
+  DeviceTelemetry(
+    this.flexionPercent,
+    this.contactPercent,
+    this.phase, {
+    DateTime? receivedAt,
+  }) : receivedAt = receivedAt ?? DateTime.now();
 
   final int flexionPercent;
   final int contactPercent;
   final GesturePhase phase;
+  final DateTime receivedAt;
 
   String get phaseLabel => switch (phase) {
     GesturePhase.rest => 'Reposo',

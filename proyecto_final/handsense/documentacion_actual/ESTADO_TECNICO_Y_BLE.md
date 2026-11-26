@@ -1,10 +1,15 @@
-# Estado técnico y contrato de integración — 20-11-2026
+# Estado técnico y contrato de integración — actualizado 24-11-2026
 
 ## Confirmaciones respaldadas por registros de Codex / terminal
 - Flutter Android local: navegación Inicio/Ejercicio/Historial/Ajustes y modo demostración. **7 pruebas Flutter aprobadas**, `flutter analyze` sin problemas y **APK debug compilado** luego de resolver dependencias Android.
 - Dependencias de compilación registradas: `flutter_reactive_ble 5.5.0`, `permission_handler 12.0.3`; módulos transitivos reactive_ble 5.5.0 fijados y ajuste compileSdk 36 en Gradle.
 - Pruebas de lógica C++: **9 aprobadas** el 21-11; incluyen orden inverso, simultaneidad, liberación invertida y recuperación.
-- `mobile/` y `firmware/ble_diagnostico/sketch.ino` están versionados en `main`; los logs no sustituyen una prueba física.
+- Candidato físico XIAO: **14 grupos de pruebas aprobados** con regresiones,
+  calibración, recuperación y desbordamiento temporal.
+- `mobile/` y el diagnóstico BLE están versionados en `main`; su archivo
+  principal local se renombró a `firmware/ble_diagnostico/ble_diagnostico.ino`
+  para cumplir la convención de compilación de Arduino. Los logs no sustituyen
+  una prueba física.
 - Wokwi: secuencia de pinza completa `fusion=1 flex_solo=1 inc=0` y flexión sin contacto `fusion=0 flex_solo=1 inc=1`, observadas en simulación.
 
 ## Pendiente de verificar
@@ -18,9 +23,13 @@
 
 `firmware/xiao_integrado/` reúne los GPIO reales, calibración NVS, detector,
 dos LED, BLE, telemetría y comandos `PING`/`RESET`. La app puede mostrar
-flexión/contacto relativos y estado en vivo. **Todavía no se ha compilado ni
-probado en XIAO**, por lo que sigue clasificado como implementado sin validar.
-El buzzer está deshabilitado hasta identificar su tipo y corriente.
+flexión/contacto relativos y estado en vivo. Alex confirmó compilación objetivo
+con Arduino CLI 1.6.0, core ESP32 3.3.12 y FQBN
+`esp32:esp32:XIAO_ESP32C3`: diagnóstico BLE 608367 B de flash (46 %) y 17804 B
+de RAM estática (5 %); integrado 639493 B (48 %) y 18396 B (5 %). Está
+**compilado para XIAO, pero todavía no conectado, flasheado ni probado
+físicamente**. El buzzer permanece deshabilitado hasta identificar tipo y
+corriente.
 
 **Verificación Flutter 24-11:** Alex ejecutó `flutter analyze`, `flutter test` y
 `flutter build apk --debug` después de integrar telemetría: análisis sin

@@ -1,0 +1,11 @@
+{
+  "flex_medido": "—",
+  "flex_ref": "—",
+  "flex_error": "—",
+  "fsr_medido": "—",
+  "fsr_ref": "—",
+  "fsr_error": "—",
+  "estado": "Mediciones físicas pendientes",
+  "dificultad": "FSR y rango útil del ADC. Se revisan el divisor y las referencias de reposo.",
+  "alimentacion": "USB a placa · sensores a 3,3 V · GND común"
+}

@@ -38,6 +38,58 @@ La documentación oficial confirma D1/GPIO3 y D2/GPIO4 como canales ADC1. Con Ar
 ## Motor: aún NO conectar
 Si es **motor suelto** compatible con driver elegido: GPIO → resistencia serie gate (100–330 Ω inicial) → gate MOSFET; gate → 100kΩ → GND; source → GND; drain → motor negativo; motor positivo → fuente **nominal adecuada**; GND común controlado; diodo de rueda libre inverso (cátodo a +motor, ánodo a drain) si corresponde. **Verificar hoja de datos, encapsulado, fuente y corriente.** No conectar directamente motor al GPIO ni dar por hecho que 3V3 puede alimentarlo. Si motor es módulo con driver, diseñar según módulo, no por duplicación.
 
+## Batería y accesibilidad de la placa
+
+La documentación oficial del XIAO ESP32-C3 especifica entrada `BAT` de 3,7 V,
+administración de carga integrada y corrientes nominales de 380 mA (rápida) y
+40 mA (lenta). Esto **no confirma** que una celda concreta sea compatible:
+antes de usarla hay que identificar LiPo 1S, tensión, capacidad, protección,
+polaridad y corriente máxima de carga admitida por su fabricante.
+
+- Los pads inferiores `BAT+` y `BAT-` se identificarán por la serigrafía/plano
+  oficial y se comprobarán con multímetro antes de soldar. No deducir polaridad
+  por el color de un conector.
+- Con placa y batería desconectadas, soldar cables cortos aislados a los pads y
+  terminarlos en un conector desmontable polarizado. Añadir alivio de tensión.
+  **Nunca soldar directamente sobre la celda LiPo.**
+- Mantener accesibles USB-C, BOOT, RESET y el conector de antena; no cubrir ni
+  doblar la antena y evitar metal encima o inmediatamente debajo de ella.
+- Las primeras pruebas se hacen por USB-C de datos y con la batería físicamente
+  desconectada. El montaje no se cierra hasta completar las pruebas.
+- El XIAO ESP32-C3 no trae una señal ADC dedicada a la batería. Medirla por
+  firmware exigiría un divisor externo y consumir un ADC; no se incorpora al
+  prototipo actual. Usar multímetro.
+
+Fuente primaria: [Seeed Studio, XIAO ESP32-C3 Getting Started](https://wiki.seeedstudio.com/XIAO_ESP32C3_Getting_Started/).
+
+## Procedimiento incremental de integración
+
+Cada etapa se ejecuta solo si la anterior deja evidencia satisfactoria.
+
+| Etapa | Conexiones y firmware/comando | Resultado y evidencia | Condición para avanzar |
+|---|---|---|---|
+| 0. USB | Solo XIAO, antena y USB-C de datos; sin batería/periféricos. `lsusb`; `arduino-cli board list`. Compilar/cargar después un ejemplo mínimo de arranque serie. | Puerto detectado y mensaje estable a 115200; guardar salida y foto. | Sin reinicios ni calentamiento. |
+| 1. Preparar batería | Todo sin alimentación. Soldar cables aislados `BAT+`/`BAT-` a conector polarizado; celda aún desconectada. | Continuidad correcta, sin corto y polaridad etiquetada; foto + multímetro. | Revisión cruzada de ambos integrantes. |
+| 2. BLE | USB, sin sensores/batería. Cargar `firmware/ble_diagnostico`; nRF Connect: suscribir eventos y escribir `HS1,C,PING`. | Anuncio `HandSense-BLE-Lab` y `HS1,A,PING,OK`; captura nRF Connect. | Reconexión y ACK repetibles. |
+| 3. ADC | Firmware integrado; conectar primero un divisor a 3V3/GND/D1, luego el otro a D2. Motor/buzzer desconectados. | ADC crudo y mV cambian coherentemente; tabla contra multímetro, sin saturación sostenida. | Polaridad, rango y divisor confirmados individualmente. |
+| 4. Calibración/NVS | Serie 115200: `b`, `r` en reposo, `p` en pinza, `v`; reiniciar placa y repetir `v`. | Referencias estables, guardado confirmado y recuperación tras reinicio; log. | Sin conteos antes de calibrar ni con señal no evaluable. |
+| 5. Actuadores | LED verde y ámbar, uno a uno, cada uno con 330 Ω. Buzzer solo tras identificar modelo/corriente/driver. | Pulsos correctos sin reinicio; tensión/corriente y video. | Compatibilidad eléctrica documentada. |
+| 6. Integrado | Sensores + LED + firmware integrado; luego BLE y Flutter. | Cinco escenarios, eventos únicos, telemetría y PING/RESET; video y logs. | Secuencias repetibles y sin desconexiones críticas. |
+| 7. Batería | Desconectar USB; verificar celda y polaridad con multímetro; conectar mediante el conector preparado. | Arranque y duración observados, sin calor/caída anormal; registro de tensión. | Alimentación estable bajo BLE y actuadores. |
+| 8. Montaje final | Fijación textil, alivio de tensión, USB/BOOT/RESET/antena accesibles. | Ensayo completo y fotos finales. | Repetir prueba funcional después de vestirlo. |
+
+Comandos preparados (no ejecutan carga mientras se omita `upload`):
+
+```sh
+lsusb | grep -Ei 'Espressif|Seeed|303a|2886'
+arduino-cli board list
+arduino-cli compile --fqbn esp32:esp32:XIAO_ESP32C3 firmware/xiao_integrado
+arduino-cli compile --fqbn esp32:esp32:XIAO_ESP32C3 firmware/ble_diagnostico
+# Solo con autorización y puerto confirmado:
+arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:XIAO_ESP32C3 firmware/xiao_integrado
+arduino-cli monitor -p /dev/ttyACM0 --config baudrate=115200
+```
+
 ## Estructura física y prueba
 1. **Mesa:** protoboard, XIAO accesible por USB, antena sin tensión ni interferencia de soporte, sensores conectables sin flexionar sus terminales.
 2. **Antes de energizar:** multímetro continuidad de rieles (pueden estar cortados), cortocircuitos 3V3/GND, polaridad LEDs, pines reales y rutas de masas.
