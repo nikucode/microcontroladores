@@ -155,7 +155,7 @@ class WelcomeScreen extends StatelessWidget {
         ),
       ),
       const Text(
-        'Aprende y comprende la pinza pulgar–índice mediante dos señales complementarias.',
+        'Herramienta de práctica y registro de movimientos de pinza.',
         textAlign: TextAlign.center,
       ),
       FilledButton(
@@ -192,7 +192,7 @@ class WelcomeScreen extends StatelessWidget {
   );
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
     required this.model,
@@ -206,6 +206,14 @@ class HomeScreen extends StatelessWidget {
   final VoidCallback onGuide;
   final VoidCallback onUseDevice;
   final VoidCallback onUseDemo;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool showDemoActivity = false;
+
   @override
   Widget build(BuildContext context) => PageContent(
     children: [
@@ -213,13 +221,13 @@ class HomeScreen extends StatelessWidget {
       const Text('Practica la secuencia de pinza y comprende cada resultado.'),
       FilledButton.icon(
         key: const ValueKey('start-demo'),
-        onPressed: onExercise,
+        onPressed: widget.onExercise,
         icon: const Icon(Icons.play_arrow),
         label: const Text('Preparar práctica'),
       ),
       OutlinedButton.icon(
         key: const ValueKey('open-guide'),
-        onPressed: onGuide,
+        onPressed: widget.onGuide,
         icon: const Icon(Icons.menu_book_outlined),
         label: const Text('Ver guía visual'),
       ),
@@ -228,44 +236,326 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
-              model.isConnected ? Icons.bluetooth_connected : Icons.bluetooth,
-              semanticLabel: model.isConnected
+              widget.model.isConnected
+                  ? Icons.bluetooth_connected
+                  : Icons.bluetooth,
+              semanticLabel: widget.model.isConnected
                   ? 'Dispositivo conectado'
                   : 'Dispositivo sin conectar',
             ),
             const SizedBox(height: 8),
             Text(
-              model.isDemo
+              widget.model.isDemo
                   ? 'Origen: demostración'
-                  : 'Dispositivo: ${model.connectionState.deviceName ?? 'HandSense'}',
+                  : 'Dispositivo: ${widget.model.connectionState.deviceName ?? 'HandSense'}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             Text(
-              model.isConnected
+              widget.model.isConnected
                   ? 'Conectado'
-                  : model.isDemo
+                  : widget.model.isDemo
                   ? 'Datos simulados'
                   : 'Sin conexión',
             ),
             const SizedBox(height: 12),
-            if (model.isDemo)
+            if (widget.model.isDemo)
               TextButton.icon(
                 key: const ValueKey('connect-device'),
-                onPressed: onUseDevice,
+                onPressed: widget.onUseDevice,
                 icon: const Icon(Icons.bluetooth_searching),
                 label: const Text('Conectar equipo'),
               )
             else
               TextButton(
                 key: const ValueKey('use-demo'),
-                onPressed: onUseDemo,
+                onPressed: widget.onUseDemo,
                 child: const Text('Usar demostración'),
               ),
           ],
         ),
       ),
+      ActivityDashboard(
+        sessions: widget.model.sessions,
+        showDemo: showDemoActivity,
+        onModeChanged: (demo) => setState(() => showDemoActivity = demo),
+      ),
     ],
   );
+}
+
+class ActivityDashboard extends StatelessWidget {
+  const ActivityDashboard({
+    super.key,
+    required this.sessions,
+    required this.showDemo,
+    required this.onModeChanged,
+  });
+
+  final List<SessionRecord> sessions;
+  final bool showDemo;
+  final ValueChanged<bool> onModeChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = ActivitySummary.fromSessions(sessions, demo: showDemo);
+    final percentage = summary.completionPercentage;
+    final latest = summary.latest;
+    return Column(
+      key: const ValueKey('activity-dashboard'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Actividad', style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            ChoiceChip(
+              key: const ValueKey('activity-real'),
+              label: const Text('Actividad real'),
+              selected: !showDemo,
+              onSelected: (_) => onModeChanged(false),
+            ),
+            ChoiceChip(
+              key: const ValueKey('activity-demo'),
+              label: const Text('Demostración'),
+              selected: showDemo,
+              onSelected: (_) => onModeChanged(true),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (summary.sessions.isEmpty)
+          Panel(
+            child: Text(
+              showDemo
+                  ? 'Aún no hay sesiones de demostración registradas.'
+                  : 'Aún no hay sesiones reales registradas.',
+            ),
+          ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final singleColumn =
+                constraints.maxWidth < 340 ||
+                MediaQuery.textScalerOf(context).scale(1) >= 1.5;
+            final width = singleColumn
+                ? constraints.maxWidth
+                : (constraints.maxWidth - 12) / 2;
+            return Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _ActivityMetric(
+                  width: width,
+                  label: 'Sesiones registradas',
+                  value: '${summary.sessionCount}',
+                ),
+                _ActivityMetric(
+                  width: width,
+                  label: 'Pinzas completas',
+                  value: '${summary.complete}',
+                ),
+                _ActivityMetric(
+                  width: width,
+                  label: 'Intentos incompletos',
+                  value: '${summary.incomplete}',
+                ),
+                _ActivityMetric(
+                  width: width,
+                  label: 'Intentos evaluables',
+                  value: '${summary.evaluable}',
+                ),
+                _ActivityMetric(
+                  key: const ValueKey('dashboard-percentage'),
+                  width: width,
+                  label: 'Intentos completos',
+                  value: percentage == null ? '—' : '${percentage.round()} %',
+                ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 12),
+        Panel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Última sesión',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                latest == null
+                    ? 'Sin datos disponibles.'
+                    : '${latest.source} · ${latest.attempts.length} registros\n'
+                          '${latest.complete} completas · ${latest.incomplete} incompletas · '
+                          '${latest.unreliable} no evaluables',
+              ),
+            ],
+          ),
+        ),
+        if (summary.recentSessions.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Panel(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Últimas sesiones',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 4,
+                  children: [
+                    _ChartLegend(
+                      color: Theme.of(context).colorScheme.primary,
+                      label: 'Completas',
+                    ),
+                    _ChartLegend(
+                      color: Theme.of(context).colorScheme.tertiary,
+                      label: 'Incompletas',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _SessionBarChart(sessions: summary.recentSessions),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ActivityMetric extends StatelessWidget {
+  const _ActivityMetric({
+    super.key,
+    required this.width,
+    required this.label,
+    required this.value,
+  });
+
+  final double width;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: width,
+    child: Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(value, style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 4),
+            Text(label),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class _ChartLegend extends StatelessWidget {
+  const _ChartLegend({required this.color, required this.label});
+  final Color color;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Container(width: 12, height: 12, color: color),
+      const SizedBox(width: 6),
+      Text(label),
+    ],
+  );
+}
+
+class _SessionBarChart extends StatelessWidget {
+  const _SessionBarChart({required this.sessions});
+  final List<SessionRecord> sessions;
+
+  @override
+  Widget build(BuildContext context) {
+    final maxEvaluable = sessions
+        .map((item) => item.complete + item.incomplete)
+        .fold<int>(1, (maximum, value) => value > maximum ? value : maximum);
+    return Column(
+      children: [
+        for (final session in sessions)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Semantics(
+              label:
+                  'Sesión ${session.id}: ${session.complete} completas y ${session.incomplete} incompletas',
+              child: Row(
+                children: [
+                  SizedBox(width: 36, child: Text('S${session.id}')),
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final evaluable = session.complete + session.incomplete;
+                        if (evaluable == 0) {
+                          return Container(
+                            height: 20,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          );
+                        }
+                        return Align(
+                          alignment: Alignment.centerLeft,
+                          child: SizedBox(
+                            width:
+                                constraints.maxWidth * evaluable / maxEvaluable,
+                            height: 20,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(6),
+                              child: Row(
+                                children: [
+                                  if (session.complete > 0)
+                                    Expanded(
+                                      flex: session.complete,
+                                      child: ColoredBox(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                    ),
+                                  if (session.incomplete > 0)
+                                    Expanded(
+                                      flex: session.incomplete,
+                                      child: ColoredBox(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .tertiary,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 class _GuideStep {
@@ -326,7 +616,7 @@ class _GuideScreenState extends State<GuideScreen> {
     return PageContent(
       children: [
         Text(
-          'Guía · Mano derecha',
+          'Guía · Mano izquierda',
           style: Theme.of(context).textTheme.titleLarge,
         ),
         Text('Paso ${step + 1} de ${_guideSteps.length}'),
@@ -337,7 +627,11 @@ class _GuideScreenState extends State<GuideScreen> {
             value: (step + 1) / _guideSteps.length,
           ),
         ),
-        Text(item.title, style: Theme.of(context).textTheme.headlineMedium),
+        Text(
+          item.title,
+          key: const ValueKey('guide-step-title'),
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
         HandIllustration(
           asset: item.asset,
           semanticLabel: '${item.title}. ${item.instruction}',
@@ -454,7 +748,7 @@ class PreparationScreen extends StatelessWidget {
         if (model.isDemo) ...[
           const HandIllustration(
             asset: 'assets/handsense/reposo.png',
-            semanticLabel: 'Mano derecha relajada, preparada para practicar',
+            semanticLabel: 'Mano izquierda relajada, preparada para practicar',
           ),
           const Panel(
             child: Text(
@@ -464,7 +758,7 @@ class PreparationScreen extends StatelessWidget {
         ] else ...[
           const HandIllustration(
             asset: 'assets/handsense/colocacion_dorsal.png',
-            semanticLabel: 'Colocación sobre mano derecha: flexivo morado en dorso del índice y FSR marrón en yema del pulgar',
+            semanticLabel: 'Colocación sobre mano izquierda: flexivo morado en dorso del índice y FSR marrón en yema del pulgar',
           ),
           const Panel(
             child: Text(
@@ -519,7 +813,7 @@ class ExerciseScreen extends StatelessWidget {
             HandIllustration(
               asset: _exerciseAsset(model.telemetry?.phase),
               semanticLabel:
-                  'Mano derecha mostrando la etapa esperada de la pinza',
+                  'Mano izquierda mostrando la etapa esperada de la pinza',
             ),
             const SizedBox(height: 12),
             const Text(
@@ -723,6 +1017,7 @@ class HistoryScreen extends StatelessWidget {
                           )
                         : Card(
                             child: ExpansionTile(
+                              key: ValueKey('history-attempt-$i'),
                               title: Text(
                                 '$i. ${session.attempts[i - 1].title}',
                               ),

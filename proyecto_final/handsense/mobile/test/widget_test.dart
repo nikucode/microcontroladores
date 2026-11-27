@@ -55,16 +55,28 @@ class FakeDeviceSource implements AttemptSource, DeviceControls {
 }
 
 Future<void> tapVisible(WidgetTester tester, Finder target) async {
+  // HandSense carga preferencias antes de construir la navegación. Esperar ese
+  // estado evita tratar la pantalla de carga como si fuera una lista vacía.
+  await tester.pumpAndSettle();
+
   // ListView builds off-screen children lazily. Scroll to create the target
   // before ensureVisible tries to access its Element.
   if (target.evaluate().isEmpty) {
+    final scrollables = find.byType(Scrollable);
+    if (scrollables.evaluate().isEmpty) {
+      throw TestFailure(
+        'No se encontró el objetivo y la pantalla actual no contiene un '
+        'Scrollable donde buscarlo: $target',
+      );
+    }
     await tester.scrollUntilVisible(
       target,
       200,
-      scrollable: find.byType(Scrollable).first,
+      scrollable: scrollables.first,
       maxScrolls: 50,
     );
   }
+  expect(target, findsAtLeastNWidgets(1));
   await tester.ensureVisible(target);
   await tester.pumpAndSettle();
   await tester.tap(target);
@@ -79,7 +91,7 @@ void main() {
   testWidgets('primera apertura muestra bienvenida y luego abre inicio', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({'welcomeCompleted': true});
     await tester.pumpWidget(const HandSenseApp());
     await tester.pumpAndSettle();
     expect(find.text('HandSense'), findsOneWidget);
@@ -89,13 +101,96 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('welcome-start')));
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('start-demo')), findsOneWidget);
+  });
 
-    await tester.pumpWidget(const SizedBox());
-    await tester.pumpAndSettle();
+  testWidgets('bienvenida no reaparece al navegar durante el arranque', (
+    tester,
+  ) async {
     await tester.pumpWidget(const HandSenseApp());
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('welcome-start')));
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const ValueKey('nav-1')));
+    await tapVisible(tester, find.byKey(const ValueKey('nav-0')));
     expect(find.byKey(const ValueKey('welcome-start')), findsNothing);
     expect(find.byKey(const ValueKey('start-demo')), findsOneWidget);
+  });
+
+  testWidgets('dashboard real vacío muestra porcentaje indefinido', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('dashboard-percentage')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(
+      find.text('Aún no hay sesiones reales registradas.'),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('dashboard-percentage')),
+        matching: find.text('—'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  test('dashboard calcula evaluables y separa real de demostración', () {
+    final records = [
+      SessionRecord(
+        1,
+        DateTime(2026, 11, 26, 10),
+        'Dispositivo HandSense',
+        false,
+        const [
+          Attempt(1, Outcome.complete),
+          Attempt(2, Outcome.noContact),
+          Attempt(3, Outcome.unreliable),
+        ],
+      ),
+      SessionRecord(2, DateTime(2026, 11, 26, 11), 'Demostración', true, const [
+        Attempt(4, Outcome.complete),
+        Attempt(5, Outcome.complete),
+      ]),
+    ];
+
+    final real = ActivitySummary.fromSessions(records, demo: false);
+    final demo = ActivitySummary.fromSessions(records, demo: true);
+    expect(real.sessionCount, 1);
+    expect(real.complete, 1);
+    expect(real.incomplete, 1);
+    expect(real.evaluable, 2);
+    expect(real.completionPercentage, 50);
+    expect(demo.sessionCount, 1);
+    expect(demo.complete, 2);
+    expect(demo.incomplete, 0);
+    expect(demo.completionPercentage, 100);
+  });
+
+  testWidgets('dashboard demo se actualiza al guardar una sesión', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
+    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const ValueKey('start-demo')));
+    await tapVisible(tester, find.byKey(const ValueKey('begin-exercise')));
+    await tapVisible(tester, find.byKey(const ValueKey('demo-controls')));
+    await tapVisible(tester, find.byKey(const ValueKey('scenario-complete')));
+    await tapVisible(tester, find.byKey(const ValueKey('finish-session')));
+    await tapVisible(tester, find.text('Volver al inicio'));
+    await tapVisible(tester, find.byKey(const ValueKey('activity-demo')));
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('dashboard-percentage')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Sesiones registradas'), findsOneWidget);
+    expect(find.text('100 %'), findsOneWidget);
+    expect(find.textContaining('Demostración · 1 registros'), findsOneWidget);
   });
 
   test('pares críticos cumplen contraste AA', () {
@@ -162,7 +257,8 @@ void main() {
   testWidgets('navegación, escenario y explicación conservada en historial', (
     tester,
   ) async {
-    await tester.pumpWidget(const HandSenseApp());
+    await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
+    await tester.pumpAndSettle();
     expect(find.text('Movimiento con sentido'), findsOneWidget);
     expect(find.text('Simular: Pinza completa'), findsNothing);
     await tapVisible(tester, find.byKey(const ValueKey('start-demo')));
@@ -181,6 +277,7 @@ void main() {
     await tapVisible(tester, find.byKey(const ValueKey('summary-history')));
     expect(find.text('Tus sesiones'), findsOneWidget);
     await tapVisible(tester, find.text('Sesión 1 · Demostración'));
+    await tapVisible(tester, find.byKey(const ValueKey('history-attempt-1')));
     expect(find.text('Por qué se contó'), findsOneWidget);
     expect(
       find.textContaining('Se registraron flexión y contacto'),
@@ -197,13 +294,22 @@ void main() {
   testWidgets('la guía no genera intentos y permite recorrer cinco pasos', (
     tester,
   ) async {
-    await tester.pumpWidget(const HandSenseApp());
+    await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
     await tapVisible(tester, find.byKey(const ValueKey('open-guide')));
+    expect(find.text('Guía · Mano izquierda'), findsOneWidget);
+    expect(find.textContaining('Mano derecha'), findsNothing);
     expect(find.text('Mano abierta'), findsOneWidget);
     for (var i = 0; i < 4; i++) {
       await tapVisible(tester, find.byKey(const ValueKey('guide-next')));
     }
-    expect(find.text('Retorno al reposo'), findsOneWidget);
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const ValueKey('guide-step-title'), skipOffstage: false),
+          )
+          .data,
+      'Retorno al reposo',
+    );
     expect(find.text('Preparar práctica'), findsOneWidget);
     await tapVisible(tester, find.byKey(const ValueKey('guide-repeat')));
     expect(find.text('Mano abierta'), findsOneWidget);
@@ -216,14 +322,14 @@ void main() {
   });
 
   testWidgets('preferencias de accesibilidad persisten juntas', (tester) async {
-    await tester.pumpWidget(const HandSenseApp());
+    await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
     await tester.pumpAndSettle();
     await tapVisible(tester, find.byKey(const ValueKey('nav-3')));
     await tapVisible(tester, find.text('Texto más grande'));
     await tapVisible(tester, find.text('Alto contraste'));
     await tester.pumpWidget(const SizedBox());
     await tester.pumpAndSettle();
-    await tester.pumpWidget(const HandSenseApp());
+    await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
     await tester.pumpAndSettle();
     await tapVisible(tester, find.byKey(const ValueKey('nav-3')));
     final switches = tester.widgetList<SwitchListTile>(
@@ -273,7 +379,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
       addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
-      await tester.pumpWidget(const HandSenseApp());
+      await tester.pumpWidget(const HandSenseApp(showWelcomeOnLaunch: false));
       for (var i = 0; i < 4; i++) {
         await tapVisible(tester, find.byKey(ValueKey('nav-$i')));
         expect(tester.takeException(), isNull);

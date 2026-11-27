@@ -10,7 +10,9 @@ import 'ui/app_theme.dart';
 void main() => runApp(const HandSenseApp());
 
 class HandSenseApp extends StatefulWidget {
-  const HandSenseApp({super.key});
+  const HandSenseApp({super.key, this.showWelcomeOnLaunch = true});
+
+  final bool showWelcomeOnLaunch;
   @override
   State<HandSenseApp> createState() => _HandSenseAppState();
 }
@@ -30,6 +32,7 @@ class _HandSenseAppState extends State<HandSenseApp> {
   @override
   void initState() {
     super.initState();
+    showWelcome = widget.showWelcomeOnLaunch;
     _loadPreferences();
   }
 
@@ -37,7 +40,6 @@ class _HandSenseAppState extends State<HandSenseApp> {
     final preferences = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      showWelcome = !(preferences.getBool('welcomeCompleted') ?? false);
       largeText = preferences.getBool('largeText') ?? false;
       highContrast = preferences.getBool('highContrast') ?? false;
       preferencesReady = true;
@@ -140,9 +142,7 @@ class _HandSenseAppState extends State<HandSenseApp> {
     messenger.showSnackBar(
       SnackBar(
         content: Text(
-          acknowledged
-              ? 'El ESP32 reinició la sesión y confirmó el comando.'
-              : 'El ESP32 no confirmó el reinicio tras el reintento.',
+          acknowledged ? 'El ESP32 reinició la sesión y confirmó el comando.' : 'El equipo no confirmó el reinicio. Comprueba la conexión y el firmware del dispositivo.',
         ),
       ),
     );

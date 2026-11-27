@@ -129,3 +129,36 @@ class SessionRecord {
       attempts.where((a) => a.evaluable && !a.complete).length;
   int get unreliable => attempts.where((a) => !a.evaluable).length;
 }
+
+/// Resumen derivado exclusivamente de sesiones terminadas con procedencia
+/// conocida. Las muestras no evaluables quedan fuera de las tasas.
+class ActivitySummary {
+  ActivitySummary._(this.sessions, this.recentSessions);
+
+  factory ActivitySummary.fromSessions(
+    Iterable<SessionRecord> records, {
+    required bool demo,
+  }) {
+    final matching = records.where((record) => record.isDemo == demo).toList()
+      ..sort((a, b) => a.finishedAt.compareTo(b.finishedAt));
+    final recent = matching.length <= 7
+        ? matching
+        : matching.sublist(matching.length - 7);
+    return ActivitySummary._(
+      List.unmodifiable(matching),
+      List.unmodifiable(recent),
+    );
+  }
+
+  final List<SessionRecord> sessions;
+  final List<SessionRecord> recentSessions;
+
+  int get sessionCount => sessions.length;
+  int get complete => sessions.fold(0, (total, item) => total + item.complete);
+  int get incomplete =>
+      sessions.fold(0, (total, item) => total + item.incomplete);
+  int get evaluable => complete + incomplete;
+  double? get completionPercentage =>
+      evaluable == 0 ? null : complete * 100 / evaluable;
+  SessionRecord? get latest => sessions.isEmpty ? null : sessions.last;
+}
