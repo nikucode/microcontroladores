@@ -6,6 +6,7 @@ import 'package:handsense/main.dart';
 import 'package:handsense/data/attempt.dart';
 import 'package:handsense/ui/session_model.dart';
 import 'package:handsense/ui/app_theme.dart';
+import 'package:handsense/ui/screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FakeDeviceSource implements AttemptSource, DeviceControls {
@@ -80,6 +81,33 @@ Future<void> tapVisible(WidgetTester tester, Finder target) async {
   await tester.ensureVisible(target);
   await tester.pumpAndSettle();
   await tester.tap(target);
+  await tester.pumpAndSettle();
+}
+
+Future<void> pumpDashboard(
+  WidgetTester tester, {
+  List<SessionRecord> sessions = const [],
+  bool demo = false,
+  Size size = const Size(390, 844),
+}) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = size;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: ActivityDashboard(
+            sessions: sessions,
+            showDemo: demo,
+            onModeChanged: (_) {},
+          ),
+        ),
+      ),
+    ),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -163,6 +191,8 @@ void main() {
     expect(real.sessionCount, 1);
     expect(real.complete, 1);
     expect(real.incomplete, 1);
+    expect(real.unreliable, 1);
+    expect(real.totalAttempts, 3);
     expect(real.evaluable, 2);
     expect(real.completionPercentage, 50);
     expect(demo.sessionCount, 1);
@@ -170,6 +200,121 @@ void main() {
     expect(demo.incomplete, 0);
     expect(demo.completionPercentage, 100);
   });
+
+  testWidgets('dashboard vacío conserva indicadores y ambos gráficos', (
+    tester,
+  ) async {
+    await pumpDashboard(tester);
+    for (final key in [
+      'dashboard-total',
+      'dashboard-complete',
+      'dashboard-incomplete',
+      'dashboard-unreliable',
+      'dashboard-evaluable',
+      'dashboard-percentage',
+      'outcome-bar-chart',
+      'evolution-chart',
+    ]) {
+      expect(find.byKey(ValueKey(key)), findsOneWidget);
+    }
+    expect(find.text('Sin registros todavía.'), findsOneWidget);
+    expect(find.text('Sin sesiones para mostrar.'), findsOneWidget);
+  });
+
+  testWidgets('dashboard demo usa ejemplo simulado con valores exactos', (
+    tester,
+  ) async {
+    await pumpDashboard(tester, demo: true);
+    expect(
+      find.textContaining('Ejemplo simulado · no guardado'),
+      findsOneWidget,
+    );
+    expect(find.text('5'), findsOneWidget);
+    expect(find.text('25 %'), findsAtLeastNWidgets(1));
+    expect(
+      find.textContaining('1 completas · 3 incompletas · 1 no evaluables'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('dashboard real calcula resultados conocidos', (tester) async {
+    final records = [
+      SessionRecord(
+        1,
+        DateTime(2026, 11, 27),
+        'Dispositivo HandSense',
+        false,
+        const [
+          Attempt(1, Outcome.complete),
+          Attempt(2, Outcome.complete),
+          Attempt(3, Outcome.noContact),
+          Attempt(4, Outcome.unreliable),
+        ],
+      ),
+    ];
+    await pumpDashboard(tester, sessions: records);
+    expect(find.text('4'), findsOneWidget);
+    expect(find.text('67 %'), findsAtLeastNWidgets(1));
+    expect(
+      find.textContaining('2 completas · 1 incompletas · 1 no evaluables'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('porcentaje queda indefinido sin intentos evaluables', (
+    tester,
+  ) async {
+    final records = [
+      SessionRecord(
+        1,
+        DateTime(2026, 11, 27),
+        'Dispositivo HandSense',
+        false,
+        const [Attempt(1, Outcome.unreliable)],
+      ),
+    ];
+    await pumpDashboard(tester, sessions: records);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('dashboard-percentage')),
+        matching: find.text('—'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('dashboard mantiene separadas actividad real y demostración', (
+    tester,
+  ) async {
+    final records = [
+      SessionRecord(1, DateTime(2026, 11, 27), 'Real', false, const [
+        Attempt(1, Outcome.complete),
+      ]),
+      SessionRecord(2, DateTime(2026, 11, 27), 'Demo', true, const [
+        Attempt(2, Outcome.noContact),
+      ]),
+    ];
+    await pumpDashboard(tester, sessions: records);
+    expect(find.text('100 %'), findsAtLeastNWidgets(1));
+    await pumpDashboard(tester, sessions: records, demo: true);
+    expect(find.text('0 %'), findsAtLeastNWidgets(1));
+    expect(find.textContaining('Ejemplo simulado · no guardado'), findsNothing);
+  });
+
+  for (final dashboardSize in [
+    const Size(320, 640),
+    const Size(800, 600),
+    const Size(600, 800),
+  ]) {
+    testWidgets('dashboard adaptable sin desbordamiento en $dashboardSize', (
+      tester,
+    ) async {
+      await pumpDashboard(tester, demo: true, size: dashboardSize);
+      expect(find.byKey(const ValueKey('outcome-bar-chart')), findsOneWidget);
+      expect(find.byKey(const ValueKey('evolution-chart')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  }
 
   testWidgets('dashboard demo se actualiza al guardar una sesión', (
     tester,
@@ -188,8 +333,15 @@ void main() {
       200,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.text('Sesiones registradas'), findsOneWidget);
-    expect(find.text('100 %'), findsOneWidget);
+    expect(find.text('Intentos totales'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('dashboard-total')),
+        matching: find.text('1'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('100 %'), findsAtLeastNWidgets(1));
     expect(find.textContaining('Demostración · 1 registros'), findsOneWidget);
   });
 

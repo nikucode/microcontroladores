@@ -157,6 +157,9 @@ class ActivitySummary {
   int get complete => sessions.fold(0, (total, item) => total + item.complete);
   int get incomplete =>
       sessions.fold(0, (total, item) => total + item.incomplete);
+  int get unreliable =>
+      sessions.fold(0, (total, item) => total + item.unreliable);
+  int get totalAttempts => evaluable + unreliable;
   int get evaluable => complete + incomplete;
   double? get completionPercentage =>
       evaluable == 0 ? null : complete * 100 / evaluable;

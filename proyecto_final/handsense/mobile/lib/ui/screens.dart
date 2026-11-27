@@ -295,9 +295,31 @@ class ActivityDashboard extends StatelessWidget {
   final bool showDemo;
   final ValueChanged<bool> onModeChanged;
 
+  static final SessionRecord _demoExample = SessionRecord(
+    0,
+    DateTime(2026, 11, 27),
+    'Ejemplo simulado',
+    true,
+    const [
+      Attempt(1, Outcome.complete),
+      Attempt(2, Outcome.noContact),
+      Attempt(3, Outcome.noFlexion),
+      Attempt(4, Outcome.noRelease),
+      Attempt(5, Outcome.unreliable),
+    ],
+  );
+
   @override
   Widget build(BuildContext context) {
-    final summary = ActivitySummary.fromSessions(sessions, demo: showDemo);
+    final hasDemoSessions = sessions.any((session) => session.isDemo);
+    final usingDemoExample = showDemo && !hasDemoSessions;
+    final displayedSessions = usingDemoExample
+        ? [...sessions, _demoExample]
+        : sessions;
+    final summary = ActivitySummary.fromSessions(
+      displayedSessions,
+      demo: showDemo,
+    );
     final percentage = summary.completionPercentage;
     final latest = summary.latest;
     return Column(
@@ -325,7 +347,14 @@ class ActivityDashboard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        if (summary.sessions.isEmpty)
+        if (usingDemoExample)
+          const Panel(
+            child: Text(
+              'Ejemplo simulado · no guardado. Se muestran los cinco '
+              'resultados de demostración disponibles.',
+            ),
+          )
+        else if (summary.sessions.isEmpty)
           Panel(
             child: Text(
               showDemo
@@ -346,21 +375,31 @@ class ActivityDashboard extends StatelessWidget {
               runSpacing: 12,
               children: [
                 _ActivityMetric(
+                  key: const ValueKey('dashboard-total'),
                   width: width,
-                  label: 'Sesiones registradas',
-                  value: '${summary.sessionCount}',
+                  label: 'Intentos totales',
+                  value: '${summary.totalAttempts}',
                 ),
                 _ActivityMetric(
+                  key: const ValueKey('dashboard-complete'),
                   width: width,
                   label: 'Pinzas completas',
                   value: '${summary.complete}',
                 ),
                 _ActivityMetric(
+                  key: const ValueKey('dashboard-incomplete'),
                   width: width,
                   label: 'Intentos incompletos',
                   value: '${summary.incomplete}',
                 ),
                 _ActivityMetric(
+                  key: const ValueKey('dashboard-unreliable'),
+                  width: width,
+                  label: 'Intentos sin lectura fiable',
+                  value: '${summary.unreliable}',
+                ),
+                _ActivityMetric(
+                  key: const ValueKey('dashboard-evaluable'),
                   width: width,
                   label: 'Intentos evaluables',
                   value: '${summary.evaluable}',
@@ -368,7 +407,7 @@ class ActivityDashboard extends StatelessWidget {
                 _ActivityMetric(
                   key: const ValueKey('dashboard-percentage'),
                   width: width,
-                  label: 'Intentos completos',
+                  label: 'Porcentaje de pinzas completas',
                   value: percentage == null ? '—' : '${percentage.round()} %',
                 ),
               ],
@@ -395,37 +434,10 @@ class ActivityDashboard extends StatelessWidget {
             ],
           ),
         ),
-        if (summary.recentSessions.isNotEmpty) ...[
-          const SizedBox(height: 12),
-          Panel(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Últimas sesiones',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 4,
-                  children: [
-                    _ChartLegend(
-                      color: Theme.of(context).colorScheme.primary,
-                      label: 'Completas',
-                    ),
-                    _ChartLegend(
-                      color: Theme.of(context).colorScheme.tertiary,
-                      label: 'Incompletas',
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _SessionBarChart(sessions: summary.recentSessions),
-              ],
-            ),
-          ),
-        ],
+        const SizedBox(height: 12),
+        Panel(child: _OutcomeBarChart(summary: summary)),
+        const SizedBox(height: 12),
+        Panel(child: _EvolutionChart(sessions: summary.recentSessions)),
       ],
     );
   }
@@ -462,98 +474,182 @@ class _ActivityMetric extends StatelessWidget {
   );
 }
 
-class _ChartLegend extends StatelessWidget {
-  const _ChartLegend({required this.color, required this.label});
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      Container(width: 12, height: 12, color: color),
-      const SizedBox(width: 6),
-      Text(label),
-    ],
-  );
-}
-
-class _SessionBarChart extends StatelessWidget {
-  const _SessionBarChart({required this.sessions});
-  final List<SessionRecord> sessions;
+class _OutcomeBarChart extends StatelessWidget {
+  const _OutcomeBarChart({required this.summary});
+  final ActivitySummary summary;
 
   @override
   Widget build(BuildContext context) {
-    final maxEvaluable = sessions
-        .map((item) => item.complete + item.incomplete)
-        .fold<int>(1, (maximum, value) => value > maximum ? value : maximum);
+    final values = <(String, int, Color)>[
+      ('Completos', summary.complete, Theme.of(context).colorScheme.primary),
+      (
+        'Incompletos',
+        summary.incomplete,
+        Theme.of(context).colorScheme.tertiary,
+      ),
+      (
+        'No evaluables',
+        summary.unreliable,
+        Theme.of(context).colorScheme.error,
+      ),
+    ];
+    final maximum = values.fold<int>(
+      1,
+      (max, item) => item.$2 > max ? item.$2 : max,
+    );
     return Column(
+      key: const ValueKey('outcome-bar-chart'),
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final session in sessions)
+        const Text(
+          'Resultados por tipo',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 4),
+        const Text('Cantidad de intentos'),
+        const SizedBox(height: 12),
+        for (final item in values)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Semantics(
-              label:
-                  'Sesión ${session.id}: ${session.complete} completas y ${session.incomplete} incompletas',
+              label: '${item.$1}: ${item.$2} intentos',
               child: Row(
                 children: [
-                  SizedBox(width: 36, child: Text('S${session.id}')),
+                  SizedBox(width: 104, child: Text(item.$1)),
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {
-                        final evaluable = session.complete + session.incomplete;
-                        if (evaluable == 0) {
-                          return Container(
-                            height: 20,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                          );
-                        }
-                        return Align(
-                          alignment: Alignment.centerLeft,
-                          child: SizedBox(
-                            width:
-                                constraints.maxWidth * evaluable / maxEvaluable,
-                            height: 20,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(6),
-                              child: Row(
-                                children: [
-                                  if (session.complete > 0)
-                                    Expanded(
-                                      flex: session.complete,
-                                      child: ColoredBox(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                    ),
-                                  if (session.incomplete > 0)
-                                    Expanded(
-                                      flex: session.incomplete,
-                                      child: ColoredBox(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .tertiary,
-                                      ),
-                                    ),
-                                ],
+                        return Stack(
+                          children: [
+                            Container(
+                              height: 22,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
-                          ),
+                            if (item.$2 > 0)
+                              Container(
+                                width: constraints.maxWidth * item.$2 / maximum,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: item.$3,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                          ],
                         );
                       },
                     ),
+                  ),
+                  SizedBox(
+                    width: 40,
+                    child: Text('${item.$2}', textAlign: TextAlign.end),
                   ),
                 ],
               ),
             ),
           ),
+        if (summary.totalAttempts == 0)
+          const Center(child: Text('Sin registros todavía.')),
       ],
+    );
+  }
+}
+
+class _EvolutionChart extends StatelessWidget {
+  const _EvolutionChart({required this.sessions});
+  final List<SessionRecord> sessions;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    key: const ValueKey('evolution-chart'),
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Evolución de pinzas completas',
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 4),
+      const Text('Porcentaje por sesión · últimas 7 · escala 0–100 %'),
+      const SizedBox(height: 12),
+      Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(minHeight: 116),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: sessions.isEmpty
+            ? const Center(child: Text('Sin sesiones para mostrar.'))
+            : Column(
+                children: [
+                  for (var index = 0; index < sessions.length; index++)
+                    _EvolutionRow(index: index, session: sessions[index]),
+                ],
+              ),
+      ),
+      const SizedBox(height: 4),
+      const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [Text('0 %'), Text('100 %')],
+      ),
+    ],
+  );
+}
+
+class _EvolutionRow extends StatelessWidget {
+  const _EvolutionRow({required this.index, required this.session});
+  final int index;
+  final SessionRecord session;
+
+  @override
+  Widget build(BuildContext context) {
+    final evaluable = session.complete + session.incomplete;
+    final percentage = evaluable == 0
+        ? null
+        : session.complete * 100 / evaluable;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Semantics(
+        label:
+            'Sesión ${index + 1}: ${percentage == null ? 'porcentaje indefinido' : '${percentage.round()} por ciento'}',
+        child: Row(
+          children: [
+            SizedBox(width: 30, child: Text('S${index + 1}')),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) => Stack(
+                  children: [
+                    Container(
+                      height: 12,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest,
+                    ),
+                    if (percentage != null)
+                      Container(
+                        width: constraints.maxWidth * percentage / 100,
+                        height: 12,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 48,
+              child: Text(
+                percentage == null ? '—' : '${percentage.round()} %',
+                textAlign: TextAlign.end,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
